@@ -1,10 +1,10 @@
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Union
 from pydantic import BaseModel, Field
 from datetime import datetime
 
 class StoryOptionSchema(BaseModel):
     text: str
-    node_id: Optional[str] = None
+    node_id: Optional[Union[int, str]] = None
 
 class StoryNodeSchema(BaseModel):
     content: str
@@ -26,7 +26,7 @@ class StorySchema(BaseModel):
     class Config:
         from_attributes = True
 
-class CreateStoryRequest(StorySchema):
+class CreateStoryRequest(BaseModel):
     theme: str
 
 class CompleteStoryResponse(StorySchema):

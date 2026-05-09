@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import LoadingState from "../components/LoadingStatus";
+import LoadingState from "./LoadingStatus";
 import StoryGame from "../components/StoryGame";
 import { API_BASE_URL } from "../util";
 
@@ -46,27 +46,11 @@ function StoryLoader() {
                 <div className="error-container">
                     <h2>Error</h2>
                     <p>{error}</p>
-                    <button onClick={fetchStory} className="generate-btn">Try Again</button>
+                    <button onClick={() => fetchStory(id)} className="generate-btn">Try Again</button>
                     <button onClick={() => navigate('/')} className="btn btn-outline mt-2">Back to Home</button>
                 </div>
             ) : (
                 <StoryGame story={story} onNewStory={() => navigate('/')} />
-                // <div>
-                //     <h1 className="story-title">{story.title}</h1>
-                //     <div className="story-content">
-                //         {formatStoryText(story.content)}
-                //     </div>
-                //     <div className="story-actions">
-                //         <button onClick={() => navigate('/')} className="generate-btn">Start New Story</button>
-                //     </div>
-                // </div>
-            )}
-
-            {story && story.ending === null && (
-                <div className="story-ending">
-                    <h2>Story Ending</h2>
-                    <p>{story.ending}</p>
-                </div>
             )}
         </div>
     );

@@ -17,17 +17,14 @@ function StoryGame({ story, onNewStory }) {
     }, [story]);
 
     useEffect(() => {
-        if (currentNodeId && story && story.story_nodes) {
-            const node = story.story_nodes[currentNodeId]
+        if (currentNodeId && story && story.all_nodes) {
+            const node = story.all_nodes[currentNodeId]
 
-            setNodes(node);
-            setIsEnding(node.is_ending);
-            setIsWinningEnding(node.is_winning_ending);
-
-            if (!node.is_ending && node.options && node.options.length > 0) {
-                setOptions(node.options)
-            } else {
-                setOptions([])
+            if (node) {
+                setNodes(node);
+                setIsEnding(node.is_ending);
+                setIsWinningEnding(node.is_winning_ending);
+                setOptions(node.options || []);
             }
         }
     }, [currentNodeId, story]);
@@ -46,38 +43,38 @@ function StoryGame({ story, onNewStory }) {
 
     return (
         <div className="story-game">
-            <div className="story-card">
-                <h2 className="story-header">{story.title}</h2>
-                <div className="story-content">
-                    {nodes && <div className="story-node" >
-                        <p>{nodes.content}</p>
-                        {isEnding ? (
-                            <div className="story-endings">
-                                <h2 className="ending-text">
-                                    {isWinningEnding ? "Congratulations! You Win!" : "Game Over"}
-                                </h2>
-                                <button onClick={restartStory} className="generate-btn">Play Again</button>
-                            </div>
-                        ) : (
+            <div className="story-header">
+                <h2>{story.title}</h2>
+            </div>
+            <div className="story-content">
+                {nodes && <div className="story-node" >
+                    <p>{nodes.content}</p>
+                    {isEnding ? (
+                        <div className="story-ending">
+                            <h2 className={isWinningEnding ? "winning-message" : "ending-message"}>
+                                {isWinningEnding ? "Congratulations! You Win!" : "Game Over"}
+                            </h2>
+                            <button onClick={restartStory} className="generate-btn">Play Again</button>
+                        </div>
+                    ) : (
 
-                            <div className="story-options">
-                                <h4>Choose your next action:</h4>
-                                <div className="options-grid">
-                                    {options.map((option) => (
-                                        <button key={option.node_id} onClick={() => chooseOption(option.node_id)} className="option-btn">
-                                            {option.text}
-                                        </button>
-                                    ))}
-                                </div>
+                        <div className="story-options">
+                            <h3>Choose your next action:</h3>
+                            <div className="options-list">
+                                {options.map((option) => (
+                                    <button key={option.node_id} onClick={() => chooseOption(option.node_id)} className="option-btn">
+                                        {option.text}
+                                    </button>
+                                ))}
                             </div>
-                        )}
-                    </div>}
-                    {isEnding && (
-                        <div className="story-footer">
-                            <button onClick={onNewStory} className="generate-btn">Start New Story</button>
                         </div>
                     )}
-                </div>
+                </div>}
+                {isEnding && (
+                    <div className="story-controls">
+                        <button onClick={onNewStory} className="generate-btn">Start New Story</button>
+                    </div>
+                )}
             </div>
         </div>
     )

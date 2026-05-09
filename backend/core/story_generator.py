@@ -1,13 +1,17 @@
+# pyrefly: ignore [missing-import]
 from core.models import StoryNodeLLM, StoryLLMResponse
 from sqlalchemy.orm import Session
 
+# pyrefly: ignore [missing-import]
 from core.config import settings
 from langchain_openai import ChatOpenAI
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 
+# pyrefly: ignore [missing-import]
 from core.prompts import STORY_PROMPT
+# pyrefly: ignore [missing-import]
 from models.story import Story, Node
 from fastapi import HTTPException
 
@@ -23,7 +27,7 @@ class StoryGenerator:
             model="llama-3.3-70b-versatile",
         )
     @classmethod
-    def generate_story(cls, db:Session, session_id: str, theme: str = "fantasy") -> StoryLLMResponse:
+    def generate_story(cls, db:Session, session_id: str, theme: str = "fantasy") -> int:
         llm = cls._get_llm()
         story_parser = PydanticOutputParser(pydantic_object=StoryLLMResponse)
         
@@ -105,7 +109,7 @@ class StoryGenerator:
                 options_list.append(
                     {
                         "text": option_data.text,
-                        "next_node_id": child_node.id
+                        "node_id": str(child_node.id)
                     }
                 )
             

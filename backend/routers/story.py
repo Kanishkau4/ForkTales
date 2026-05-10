@@ -4,16 +4,22 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Cookie, Response, BackgroundTasks
 from sqlalchemy.orm import Session
-
+# pyrefly: ignore [missing-import]
 from db.database import get_db, SessionLocal
+# pyrefly: ignore [missing-import]
 from models.story import Story, Node
+# pyrefly: ignore [missing-import]
 from models.job import StoryJob
+# pyrefly: ignore [missing-import]
 from schemas.story import (
     CompleteStoryNodeResponse, 
     CompleteStoryResponse, 
-    CreateStoryRequest
+    CreateStoryRequest,
+    RecentStoryResponse
 )
+# pyrefly: ignore [missing-import]
 from schemas.job import JobStatusResponse, StoryJobRequest
+# pyrefly: ignore [missing-import]
 from core.story_generator import StoryGenerator
 
 router = APIRouter(
@@ -51,14 +57,15 @@ def create_story(
 
     background_tasks.add_task(
         generate_story_task,
-        job_id = job_id,
-        session_id = session_id,
-        theme = request.theme
+        job_id=job_id,
+        session_id=session_id,
+        theme=request.theme,
+        difficulty=request.difficulty
     )
 
     return job
 
-def generate_story_task(job_id: str, session_id: str, theme: str):
+def generate_story_task(job_id: str, session_id: str, theme: str, difficulty: str = "medium"):
     db = SessionLocal()
 
     try:
@@ -71,7 +78,7 @@ def generate_story_task(job_id: str, session_id: str, theme: str):
             db.commit()
             db.refresh(job)
         
-            story_id = StoryGenerator.generate_story(db, session_id, theme)
+            story_id = StoryGenerator.generate_story(db, session_id, theme, difficulty)
 
             job.story_id = story_id
             job.status = "completed"
@@ -80,12 +87,27 @@ def generate_story_task(job_id: str, session_id: str, theme: str):
             db.refresh(job)
 
         except Exception as e:
+            import traceback
             job.status = "failed"
-            job.error = str(e)
+            job.error = f"{str(e)}\n{traceback.format_exc()}"
             db.commit()
             db.refresh(job)
     finally:
         db.close()
+
+@router.get("/recent", response_model=list[RecentStoryResponse])
+def get_recent_stories(
+    limit: int = 8,
+    db: Session = Depends(get_db),
+):
+    """Return the most recently created stories for the homepage showcase."""
+    stories = (
+        db.query(Story)
+        .order_by(Story.created_at.desc())
+        .limit(limit)
+        .all()
+    )
+    return stories
 
 @router.get("/{story_id}/complete", response_model=CompleteStoryResponse)
 def complete_story(
@@ -128,5 +150,6 @@ def build_complete_story_tree(db: Session, story: Story) -> CompleteStoryRespons
         created_at=story.created_at,
         updated_at=story.updated_at,
         root_node=node_dicts[str(root_node.id)],
-        all_nodes=node_dicts
+        all_nodes=node_dicts,
+        theme=story.theme
     )

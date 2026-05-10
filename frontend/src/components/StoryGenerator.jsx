@@ -24,12 +24,12 @@ function StoryGenerator() {
         return () => clearInterval(pullInterval);
     }, [jobId, jobStatus]);
 
-    const generateStory = async (theme) => {
+    const generateStory = async (theme, difficulty = "medium") => {
         setIsLoading(true);
         setError(null);
         setTheme(theme);
         try {
-            const response = await axios.post(`${API_BASE_URL}/story/create`, { theme });
+            const response = await axios.post(`${API_BASE_URL}/story/create`, { theme, difficulty });
             const { job_id, status } = response.data;
             setJobId(job_id);
             setJobStatus(status);
@@ -83,15 +83,26 @@ function StoryGenerator() {
 
 
     return (
-        <div className="story-generator">
+        <div className="min-h-screen bg-[#05020a]">
             {isLoading ? (
                 <LoadingStatus theme={theme} />
             ) : error ? (
-                <div className="error-message">
-                    <h2>Error</h2>
-                    <p>{error}</p>
-                    <button onClick={() => generateStory(theme)} className="generate-btn">Try Again</button>
-                    <button onClick={() => navigate('/')} className="generate-btn">Back to Home</button>
+                <div className="min-h-screen bg-[#05020a] flex flex-col items-center justify-center p-8 text-center space-y-6">
+                    <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v2m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <h2 className="text-xl font-pixel text-white">Generation Failed</h2>
+                    <p className="text-gray-500 max-w-md">{error}</p>
+                    <div className="flex gap-4 pt-2">
+                        <button onClick={() => generateStory(theme)} className="px-6 py-2.5 bg-[#7c3aed] text-white font-semibold text-sm rounded-xl hover:bg-[#6d28d9] shadow-[0_0_20px_rgba(124,58,237,0.35)] transition-all">
+                            Try Again
+                        </button>
+                        <button onClick={reseat} className="px-6 py-2.5 glass border border-white/20 font-semibold text-sm rounded-xl hover:bg-white/10 transition-all">
+                            Back to Home
+                        </button>
+                    </div>
                 </div>
             ) : (
                 <ThemeInput onSubmit={generateStory} />

@@ -1,6 +1,6 @@
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import List, Any
+from typing import List, Any, Optional
 
 class Settings(BaseSettings):
     DATABASE_URL: str
@@ -9,6 +9,11 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: Any
     OPENAI_API_KEY: str
     GROQ_API_KEY: str
+    
+    # Supabase (optional — used for direct client SDK or auth)
+    SUPABASE_URL: Optional[str] = None
+    SUPABASE_ANON_KEY: Optional[str] = None
+    SUPABASE_SERVICE_ROLE_KEY: Optional[str] = None
     
     @field_validator("ALLOWED_ORIGINS", mode='before')
     @classmethod
@@ -24,4 +29,4 @@ class Settings(BaseSettings):
         env_delimiter=","
     )
     
-settings = Settings()   
+settings = Settings()   

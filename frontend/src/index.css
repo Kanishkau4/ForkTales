@@ -1,56 +1,137 @@
-:root {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import "tailwindcss";
 
-  color-scheme: light dark;
-  color: #333;
-  background-color: #f8f9fa;
+@theme {
+  --font-pixel: "Press Start 2P", system-ui;
+  --font-retro: "VT323", monospace;
+  --font-modern: "Space Grotesk", sans-serif;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --color-neon-pink: #ff00ff;
+  --color-neon-cyan: #00ffff;
+  --color-neon-purple: #bc13fe;
+  --color-dark-bg: #0f051d;
+  --color-darker-bg: #05020a;
+  
+  --shadow-neon-pink: 0 0 10px #ff00ff, 0 0 20px #ff00ff;
+  --shadow-neon-cyan: 0 0 10px #00ffff, 0 0 20px #00ffff;
+  --shadow-neon-purple: 0 0 10px #bc13fe, 0 0 20px #bc13fe;
 }
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+@layer base {
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@300..700&family=VT323&display=swap');
 
-body {
-  margin: 0;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 2.5rem;
-  line-height: 1.2;
-}
-
-h2 {
-  font-size: 1.8rem;
-  line-height: 1.3;
-}
-
-h3 {
-  font-size: 1.3rem;
-  line-height: 1.4;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f8f9fa;
-    background-color: #1a1a2e;
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
   }
 
-  button {
-    background-color: #3f72af;
+  body {
+    background-color: var(--color-dark-bg);
+    color: white;
+    font-family: var(--font-modern);
+    overflow-x: hidden;
+    min-height: 100vh;
   }
 
-  button:hover {
-    background-color: #1a6fb0;
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #05020a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #222;
+    border-radius: 10px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #333;
+  }
+
+  /* Pixel font is now opt-in via .font-pixel class — 
+     no longer auto-applied to all headings to avoid oversized text */
+  .font-pixel {
+    font-family: var(--font-pixel);
+    text-transform: uppercase;
+  }
+
+  .font-retro {
+    font-family: var(--font-retro);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 5px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(124, 58, 237, 0.3);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(124, 58, 237, 0.6);
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .neon-border-pink {
+    border: 2px solid var(--color-neon-pink);
+    box-shadow: var(--shadow-neon-pink);
+  }
+
+  .neon-border-cyan {
+    border: 2px solid var(--color-neon-cyan);
+    box-shadow: var(--shadow-neon-cyan);
+  }
+
+  .neon-border-purple {
+    border: 2px solid #7c3aed;
+    box-shadow: 0 0 10px #7c3aed, 0 0 20px #7c3aed;
+  }
+
+  .neon-text-pink {
+    color: var(--color-neon-pink);
+    text-shadow: var(--shadow-neon-pink);
+  }
+
+  .neon-text-cyan {
+    color: var(--color-neon-cyan);
+    text-shadow: var(--shadow-neon-cyan);
+  }
+
+  .pixel-border {
+    border-style: solid;
+    border-width: 4px;
+    border-image-slice: 2;
+    border-image-width: 2;
+    border-image-outset: 0;
+    border-image-source: url('data:image/svg+xml;utf8,<?xml version="1.0" encoding="UTF-8" ?><svg version="1.1" width="5" height="5" xmlns="http://www.w3.org/2000/svg"><path d="M2 1 h1 v1 h-1 z M1 2 h1 v1 h-1 z M3 2 h1 v1 h-1 z M2 3 h1 v1 h-1 z" fill="white" /></svg>');
+  }
+
+  .typewriter {
+    margin: 0 auto;
+    animation: fadeIn 0.8s ease-out forwards;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes blink-caret {
+    from, to { border-color: transparent }
+    50% { border-color: #7c3aed; }
+  }
+
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
 }

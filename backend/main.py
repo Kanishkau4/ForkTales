@@ -1,18 +1,33 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+# pyrefly: ignore [missing-import]
 from core.config import settings
+# pyrefly: ignore [missing-import]
 from routers import story, job
+# pyrefly: ignore [missing-import]
 from db.database import create_tables
 
-create_tables()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Create tables
+    try:
+        print("Starting up: Creating tables...")
+        create_tables()
+        print("Tables created successfully.")
+    except Exception as e:
+        print(f"Error creating tables: {e}")
+    yield
+    # Shutdown: Clean up if needed
 
 app = FastAPI(
     title="ForkTales: Choose Your Own Adventure Stories",
     description="A platform for creating and playing choose your own adventure stories.",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
+    lifespan=lifespan
 )
 
 app.add_middleware(

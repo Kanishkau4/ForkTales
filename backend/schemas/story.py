@@ -21,6 +21,7 @@ class CompleteStoryNodeResponse(StoryNodeSchema):
 
 class StorySchema(BaseModel):
     title: str
+    theme: Optional[str] = None
     session_id: Optional[str] = None
 
     class Config:
@@ -28,6 +29,7 @@ class StorySchema(BaseModel):
 
 class CreateStoryRequest(BaseModel):
     theme: str
+    difficulty: str = "medium"  # easy | medium | hard
 
 class CompleteStoryResponse(StorySchema):
     id: int
@@ -35,7 +37,17 @@ class CompleteStoryResponse(StorySchema):
     created_at: datetime
     updated_at: datetime
     all_nodes: Dict[str, CompleteStoryNodeResponse]
+    theme: str
     
     class Config:
         from_attributes = True
 
+class RecentStoryResponse(BaseModel):
+    """Lightweight story card for the homepage showcase."""
+    id: int
+    title: str
+    theme: str
+    created_at: datetime
+
+    class Config:
+        from_attributes = True

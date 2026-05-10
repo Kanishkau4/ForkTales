@@ -10,12 +10,14 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 
 # pyrefly: ignore [missing-import]
-from core.prompts import STORY_PROMPT
+from core.prompts import get_story_prompt
 # pyrefly: ignore [missing-import]
 from models.story import Story, Node
 from fastapi import HTTPException
 
 from dotenv import load_dotenv
+import json
+import re
 
 load_dotenv()
 
@@ -26,20 +28,24 @@ class StoryGenerator:
         return ChatGroq(
             model="llama-3.3-70b-versatile",
         )
+
     @classmethod
-    def generate_story(cls, db:Session, session_id: str, theme: str = "fantasy") -> int:
+    def generate_story(cls, db: Session, session_id: str, theme: str = "fantasy", difficulty: str = "medium") -> int:
         llm = cls._get_llm()
         story_parser = PydanticOutputParser(pydantic_object=StoryLLMResponse)
         
+        # Get difficulty-aware prompt
+        story_prompt = get_story_prompt(difficulty)
+
         prompt = ChatPromptTemplate.from_messages(
             [
                 (
                     "system",
-                    STORY_PROMPT
+                    story_prompt
                 ),
                 (
                     "user",
-                    "Theme: {theme}\nFormat instructions: {format_instructions}"
+                    "Theme: {theme}\nFormat instructions: {format_instructions}\n\nRemember: output ONLY valid JSON, no comments, no extra text."
                 )
             ]
         ).partial(format_instructions=story_parser.get_format_instructions())
@@ -50,18 +56,34 @@ class StoryGenerator:
         if hasattr(raw_response, "content"):
             response_text = raw_response.content
 
-        # Robust JSON extraction: Find the first '{' and last '}'
+        # Step 1: Extract JSON block (find outermost { ... })
         start_index = response_text.find("{")
         end_index = response_text.rfind("}")
         
-        if start_index != -1 and end_index != -1:
-            response_text = response_text[start_index : end_index + 1]
+        if start_index == -1 or end_index == -1:
+            raise ValueError(f"LLM did not return valid JSON. Response: {response_text[:500]}")
             
-        story_structure = story_parser.parse(response_text)
+        response_text = response_text[start_index : end_index + 1]
+
+        # Step 2: Strip JS-style comments that break JSON parsing
+        response_text = re.sub(r'//[^\n\r]*', '', response_text)
+        response_text = re.sub(r'/\*.*?\*/', '', response_text, flags=re.DOTALL)
+        # Remove trailing commas before } or ]
+        response_text = re.sub(r',\s*([}\]])', r'\1', response_text)
+        
+        print(f"DEBUG: Cleaned LLM Response (first 200 chars): {response_text[:200]}...")
+
+        try:
+            story_structure = story_parser.parse(response_text)
+        except Exception as e:
+            print(f"ERROR: Pydantic parsing failed: {e}")
+            # print(f"DEBUG: Full response text for debugging: {response_text}")
+            raise ValueError(f"Failed to parse story structure. Check logs.")
 
         story_db = Story(
             session_id=session_id,
-            title=story_structure.title
+            title=story_structure.title,
+            theme=theme
         )
         db.add(story_db)
         db.commit()
@@ -119,9 +141,3 @@ class StoryGenerator:
         
         db.flush()
         return node
-                
-                
-
-        
-        
-    

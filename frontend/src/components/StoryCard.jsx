@@ -19,12 +19,12 @@ const DEFAULT_COLORS = {
 
 const StoryCard = ({ story, demo = false }) => {
     const navigate = useNavigate();
-    const { title, theme, desc, created_at, id } = story;
+    const { title, theme, desc, created_at, id, cover_image } = story;
     const colors = THEME_COLORS[theme] || DEFAULT_COLORS;
 
-    // AI-generated cover image from Pollinations based on the theme
+    // Use backend generated cover image if available, otherwise fallback
     const seed = id ?? Math.floor(Math.random() * 9999);
-    const coverUrl = `https://image.pollinations.ai/prompt/cinematic%20illustration%20of%20${encodeURIComponent(theme ?? 'adventure')}%20story%20dark%20fantasy%20digital%20art?width=400&height=220&seed=${seed}&nologo=true`;
+    const coverUrl = cover_image || `https://image.pollinations.ai/prompt/cinematic%20illustration%20of%20${encodeURIComponent(theme ?? 'adventure')}%20story%20dark%20fantasy%20digital%20art?width=400&height=220&seed=${seed}&nologo=true`;
 
     const handleClick = () => {
         if (!demo && id) navigate(`/story/${id}`);

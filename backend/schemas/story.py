@@ -14,6 +14,7 @@ class StoryNodeSchema(BaseModel):
 
 class CompleteStoryNodeResponse(StoryNodeSchema):
     id: int
+    background_image: Optional[str] = None
     options: List[StoryOptionSchema] = Field(default_factory=list)
 
     class Config:
@@ -30,10 +31,12 @@ class StorySchema(BaseModel):
 class CreateStoryRequest(BaseModel):
     theme: str
     difficulty: str = "medium"  # easy | medium | hard
+    user_id: Optional[str] = None
 
 class CompleteStoryResponse(StorySchema):
     id: int
     root_node: CompleteStoryNodeResponse
+    cover_image: Optional[str] = None
     created_at: datetime
     updated_at: datetime
     all_nodes: Dict[str, CompleteStoryNodeResponse]
@@ -47,6 +50,7 @@ class RecentStoryResponse(BaseModel):
     id: int
     title: str
     theme: str
+    cover_image: Optional[str] = None
     created_at: datetime
 
     class Config:

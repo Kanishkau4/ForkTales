@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../util";
+import { useAuth } from "../context/AuthContext";
 import LoadingStatus from "./LoadingStatus";
 import ThemeInput from "./ThemeInput";
 import StoryGame from "./StoryGame";
@@ -13,6 +14,7 @@ function StoryGenerator() {
     const [theme, setTheme] = useState("");
     const [jobId, setJobId] = useState(null);
     const [jobStatus, setJobStatus] = useState(null);
+    const { user } = useAuth();
 
     useEffect(() => {
         let pullInterval;
@@ -29,7 +31,11 @@ function StoryGenerator() {
         setError(null);
         setTheme(theme);
         try {
-            const response = await axios.post(`${API_BASE_URL}/story/create`, { theme, difficulty });
+            const response = await axios.post(`${API_BASE_URL}/story/create`, { 
+                theme, 
+                difficulty,
+                user_id: user?.id 
+            });
             const { job_id, status } = response.data;
             setJobId(job_id);
             setJobStatus(status);

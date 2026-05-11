@@ -83,21 +83,6 @@ function ThemeInput({ onSubmit }) {
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_40%,transparent_0%,rgba(5,2,10,0.55)_100%)]" />
                 </div>
 
-                {/* Dragon mascot — top right */}
-                <div className="absolute top-24 right-10 md:right-24 z-10 opacity-90 pointer-events-none">
-                    <div className="relative">
-                        <div className="absolute -inset-4 bg-[#7c3aed]/20 rounded-full blur-2xl animate-pulse" />
-                        <AnimatedSprite
-                            spriteUrl={dragonSprite}
-                            frameCount={4}
-                            width={72}
-                            height={72}
-                            animationDuration="0.8s"
-                            className="relative z-10 drop-shadow-[0_0_12px_rgba(124,58,237,0.8)]"
-                        />
-                    </div>
-                </div>
-
                 {/* Hero Content */}
                 <div className="relative z-10 max-w-4xl space-y-5 mt-8">
                     {/* Badge */}

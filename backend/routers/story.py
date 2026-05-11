@@ -59,13 +59,14 @@ def create_story(
         generate_story_task,
         job_id=job_id,
         session_id=session_id,
+        user_id=request.user_id,
         theme=request.theme,
         difficulty=request.difficulty
     )
 
     return job
 
-def generate_story_task(job_id: str, session_id: str, theme: str, difficulty: str = "medium"):
+def generate_story_task(job_id: str, session_id: str, user_id: str, theme: str, difficulty: str = "medium"):
     db = SessionLocal()
 
     try:
@@ -78,7 +79,7 @@ def generate_story_task(job_id: str, session_id: str, theme: str, difficulty: st
             db.commit()
             db.refresh(job)
         
-            story_id = StoryGenerator.generate_story(db, session_id, theme, difficulty)
+            story_id = StoryGenerator.generate_story(db, session_id, user_id, theme, difficulty)
 
             job.story_id = story_id
             job.status = "completed"
@@ -109,6 +110,20 @@ def get_recent_stories(
     )
     return stories
 
+@router.get("/user/{user_id}", response_model=list[RecentStoryResponse])
+def get_user_stories(
+    user_id: str,
+    db: Session = Depends(get_db),
+):
+    """Return all stories created by a specific user."""
+    stories = (
+        db.query(Story)
+        .filter(Story.user_id == user_id)
+        .order_by(Story.created_at.desc())
+        .all()
+    )
+    return stories
+
 @router.get("/{story_id}/complete", response_model=CompleteStoryResponse)
 def complete_story(
     story_id: int,
@@ -132,6 +147,7 @@ def build_complete_story_tree(db: Session, story: Story) -> CompleteStoryRespons
         node_response = CompleteStoryNodeResponse(
             id=node.id,
             content=node.content,
+            background_image=node.background_image,
             is_ending=node.is_ending,
             is_winning_ending=node.is_winning_ending,
             options=node.options
@@ -146,6 +162,7 @@ def build_complete_story_tree(db: Session, story: Story) -> CompleteStoryRespons
     return CompleteStoryResponse(
         id=story.id,
         title=story.title,
+        cover_image=story.cover_image,
         session_id=story.session_id,
         created_at=story.created_at,
         updated_at=story.updated_at,

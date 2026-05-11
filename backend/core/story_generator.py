@@ -30,7 +30,7 @@ class StoryGenerator:
         )
 
     @classmethod
-    def generate_story(cls, db: Session, session_id: str, theme: str = "fantasy", difficulty: str = "medium") -> int:
+    def generate_story(cls, db: Session, session_id: str, user_id: str, theme: str = "fantasy", difficulty: str = "medium") -> int:
         llm = cls._get_llm()
         story_parser = PydanticOutputParser(pydantic_object=StoryLLMResponse)
         
@@ -82,8 +82,10 @@ class StoryGenerator:
 
         story_db = Story(
             session_id=session_id,
+            user_id=user_id,
             title=story_structure.title,
-            theme=theme
+            theme=theme,
+            cover_image=f"https://image.pollinations.ai/prompt/16-bit%20pixel%20art%20cover%20for%20story%20titled%20{story_structure.title}%20with%20theme%20{theme}?width=1024&height=1024&nologo=true"
         )
         db.add(story_db)
         db.commit()
@@ -103,9 +105,14 @@ class StoryGenerator:
         
     @classmethod
     def _save_nodes_recursively(cls, db: Session, parent_node: StoryNodeLLM, story_db: Story, is_root: bool = False) -> Node:
+        # Generate background image URL based on content
+        scene_preview = parent_node.content[:100]
+        bg_url = f"https://image.pollinations.ai/prompt/16-bit%20pixel%20art%20background%20for%20{story_db.theme}%20scene:%20{scene_preview}?width=1920&height=1080&nologo=true"
+
         node = Node(
             story_id=story_db.id,
             content=parent_node.content,
+            background_image=bg_url,
             is_root=is_root,
             is_ending=parent_node.isEnding,
             is_winning_ending=parent_node.isWinningEnding,

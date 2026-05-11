@@ -9,6 +9,8 @@ from db.database import get_db, SessionLocal
 # pyrefly: ignore [missing-import]
 from models.story import Story, Node
 # pyrefly: ignore [missing-import]
+from models.profile import Profile
+# pyrefly: ignore [missing-import]
 from models.job import StoryJob
 # pyrefly: ignore [missing-import]
 from schemas.story import (
@@ -33,6 +35,9 @@ async def get_session_id(request: Request) -> str:
         session_id = str(uuid4())
     return session_id
 
+# pyrefly: ignore [missing-import]
+from util.email import send_story_notification
+
 @router.post("/create", response_model=JobStatusResponse)
 def create_story(
     request: CreateStoryRequest,
@@ -42,6 +47,33 @@ def create_story(
     response: Response = None
 ):
     response.set_cookie(key="session_id", value=session_id, httponly=True)
+
+    if not request.user_id:
+        raise HTTPException(status_code=401, detail="You must be logged in to create a story.")
+
+    # Mana check logic
+    today = datetime.utcnow().date()
+    profile = db.query(Profile).filter(Profile.user_id == request.user_id).first()
+    
+    if not profile:
+        profile = Profile(user_id=request.user_id, mana_points=5, last_refill_date=today)
+        db.add(profile)
+    else:
+        # Refill if not today
+        if profile.last_refill_date != today:
+            profile.mana_points = 5
+            profile.last_refill_date = today
+
+    if profile.mana_points <= 0:
+        raise HTTPException(
+            status_code=403, 
+            detail="Out of Mana! ⚡ Please come back tomorrow to forge new adventures."
+        )
+
+    # Deduct mana
+    profile.mana_points -= 1
+    db.commit()
+    db.refresh(profile)
 
     job_id = str(uuid4())
     
@@ -60,13 +92,14 @@ def create_story(
         job_id=job_id,
         session_id=session_id,
         user_id=request.user_id,
+        user_email=request.user_email,
         theme=request.theme,
         difficulty=request.difficulty
     )
 
     return job
 
-def generate_story_task(job_id: str, session_id: str, user_id: str, theme: str, difficulty: str = "medium"):
+def generate_story_task(job_id: str, session_id: str, user_id: str, user_email: str, theme: str, difficulty: str = "medium"):
     db = SessionLocal()
 
     try:
@@ -81,11 +114,18 @@ def generate_story_task(job_id: str, session_id: str, user_id: str, theme: str, 
         
             story_id = StoryGenerator.generate_story(db, session_id, user_id, theme, difficulty)
 
+            # Update job status
             job.story_id = story_id
             job.status = "completed"
             job.completed_at = datetime.utcnow()
             db.commit()
             db.refresh(job)
+
+            # Send notification email if user provided one
+            if user_email:
+                story = db.query(Story).filter(Story.id == story_id).first()
+                if story:
+                    send_story_notification(user_email, story.title, story.id)
 
         except Exception as e:
             import traceback
@@ -101,14 +141,30 @@ def get_recent_stories(
     limit: int = 8,
     db: Session = Depends(get_db),
 ):
-    """Return the most recently created stories for the homepage showcase."""
+    """Return the most recently created stories that are published for the community library."""
     stories = (
         db.query(Story)
+        .filter(Story.is_published == True)
         .order_by(Story.created_at.desc())
         .limit(limit)
         .all()
     )
     return stories
+
+@router.patch("/{story_id}/publish")
+def toggle_publish(
+    story_id: int,
+    db: Session = Depends(get_db)
+):
+    """Toggle the published status of a story."""
+    story = db.query(Story).filter(Story.id == story_id).first()
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+    
+    story.is_published = not story.is_published
+    db.commit()
+    db.refresh(story)
+    return {"status": "success", "is_published": story.is_published}
 
 @router.get("/user/{user_id}", response_model=list[RecentStoryResponse])
 def get_user_stories(

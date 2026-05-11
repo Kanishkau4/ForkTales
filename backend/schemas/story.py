@@ -32,6 +32,7 @@ class CreateStoryRequest(BaseModel):
     theme: str
     difficulty: str = "medium"  # easy | medium | hard
     user_id: Optional[str] = None
+    user_email: Optional[str] = None
 
 class CompleteStoryResponse(StorySchema):
     id: int

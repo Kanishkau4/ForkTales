@@ -16,6 +16,7 @@ class Story(Base):
     session_id = Column(String, index=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+    is_published = Column(Boolean, default=False)
 
     nodes = relationship("Node", back_populates="story")
 

@@ -1,6 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
+# pyrefly: ignore [missing-import]
 from core.config import settings
 
 # Build engine kwargs based on DB type

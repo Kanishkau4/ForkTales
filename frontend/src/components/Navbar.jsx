@@ -1,22 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { API_BASE_URL } from '../util';
+import manaGif from '../assets/mana-spining.gif';
 
 const Navbar = ({ onLoginClick }) => {
   const [scrolled, setScrolled] = useState(false);
   const { user, signOut } = useAuth();
   const [avatarUrl, setAvatarUrl] = useState('');
+  const [manaPoints, setManaPoints] = useState(5);
 
   useEffect(() => {
     const updateAvatar = () => {
-        const saved = localStorage.getItem(`avatar_${user?.id || 'guest'}`);
-        const config = saved ? JSON.parse(saved) : { style: 'pixel-art', seed: user?.email || 'adventurer' };
-        setAvatarUrl(`https://api.dicebear.com/7.x/${config.style}/svg?seed=${encodeURIComponent(config.seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`);
+      const saved = localStorage.getItem(`avatar_${user?.id || 'guest'}`);
+      const config = saved ? JSON.parse(saved) : { style: 'pixel-art', seed: user?.email || 'adventurer' };
+      setAvatarUrl(`https://api.dicebear.com/7.x/${config.style}/svg?seed=${encodeURIComponent(config.seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`);
     };
 
     updateAvatar();
     window.addEventListener('avatarUpdate', updateAvatar);
-    return () => window.removeEventListener('avatarUpdate', updateAvatar);
+
+    // Fetch Mana points
+    const fetchMana = async () => {
+      if (user) {
+        try {
+          const { data } = await axios.get(`${API_BASE_URL}/user/${user.id}/profile`);
+          setManaPoints(data.mana_points);
+        } catch (error) {
+          console.error("Failed to fetch mana", error);
+        }
+      }
+    };
+
+    fetchMana();
+    // Allow other components to trigger a mana update
+    window.addEventListener('manaUpdate', fetchMana);
+
+    return () => {
+      window.removeEventListener('avatarUpdate', updateAvatar);
+      window.removeEventListener('manaUpdate', fetchMana);
+    };
   }, [user]);
 
   useEffect(() => {
@@ -58,19 +82,30 @@ const Navbar = ({ onLoginClick }) => {
         </div>
         {!user ? (
           <div className="flex items-center gap-3">
-            <button onClick={onLoginClick} className="px-5 py-2 rounded-xl text-sm font-semibold border border-white/20 hover:bg-white hover:text-black transition-all duration-200">
+            <button onClick={() => onLoginClick('login')} className="px-5 py-2 rounded-xl text-sm font-semibold border border-white/20 hover:bg-white hover:text-black transition-all duration-200">
               Login
             </button>
-            <button onClick={onLoginClick} className="px-5 py-2 rounded-xl text-sm font-semibold bg-[#7c3aed] text-white hover:bg-[#6d28d9] shadow-[0_0_20px_rgba(124,58,237,0.35)] transition-all duration-200">
+            <button onClick={() => onLoginClick('signup')} className="px-5 py-2 rounded-xl text-sm font-semibold bg-[#7c3aed] text-white hover:bg-[#6d28d9] shadow-[0_0_20px_rgba(124,58,237,0.35)] transition-all duration-200">
               Sign Up
             </button>
           </div>
         ) : (
           <div className="flex items-center gap-4">
+
+            {/* Mana Display */}
+            <div className="flex items-center gap-2 text-yellow-400 font-pixel text-xs bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 shadow-[0_0_10px_rgba(250,204,21,0.2)]">
+              <img
+                src={manaGif}
+                alt="Mana"
+                className="w-6 h-6 object-contain scale-150 origin-center"
+              />
+              <span>{manaPoints}/5</span>
+            </div>
+
             <Link to="/dashboard" className="flex items-center gap-2 group cursor-pointer hover:bg-white/5 p-1 pr-3 rounded-2xl transition-colors">
               <div className="w-9 h-9 rounded-xl border border-white/10 overflow-hidden bg-white/5 transition-transform group-hover:scale-105 group-hover:shadow-[0_0_10px_rgba(124,58,237,0.3)]">
-                <img 
-                  src={avatarUrl} 
+                <img
+                  src={avatarUrl}
                   alt="Avatar"
                   className="w-full h-full object-cover"
                 />

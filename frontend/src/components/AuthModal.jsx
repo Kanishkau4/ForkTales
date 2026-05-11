@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 
-function AuthModal({ onClose }) {
+function AuthModal({ onClose, initialMode = 'login' }) {
     const { signIn, signUp, signInWithGoogle } = useAuth()
-    const [mode, setMode] = useState('login') // 'login' | 'signup'
+    const [mode, setMode] = useState(initialMode) // 'login' | 'signup'
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState('')

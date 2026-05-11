@@ -9,6 +9,7 @@ class Settings(BaseSettings):
     ALLOWED_ORIGINS: Any
     OPENAI_API_KEY: str
     GROQ_API_KEY: str
+    RESEND_API_KEY: Optional[str] = None
     
     # Supabase (optional — used for direct client SDK or auth)
     SUPABASE_URL: Optional[str] = None

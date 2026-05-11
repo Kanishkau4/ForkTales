@@ -5,7 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 # pyrefly: ignore [missing-import]
 from core.config import settings
 # pyrefly: ignore [missing-import]
-from routers import story, job
+from routers import story, job, user
 # pyrefly: ignore [missing-import]
 from db.database import create_tables
 
@@ -40,6 +40,7 @@ app.add_middleware(
 
 app.include_router(story.router, prefix=settings.API_PREFIX)
 app.include_router(job.router, prefix=settings.API_PREFIX)
+app.include_router(user.router, prefix=settings.API_PREFIX)
 
 
 if __name__ == "__main__":

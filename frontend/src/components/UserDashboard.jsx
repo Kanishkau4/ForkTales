@@ -57,6 +57,19 @@ function UserDashboard() {
         window.dispatchEvent(new Event('avatarUpdate'));
     };
 
+    const handleTogglePublish = async (storyId) => {
+        try {
+            const { data } = await axios.patch(`${API_BASE_URL}/story/${storyId}/publish`);
+            if (data.status === 'success') {
+                setMyStories(prev => prev.map(s => 
+                    s.id === storyId ? { ...s, is_published: data.is_published } : s
+                ));
+            }
+        } catch (err) {
+            console.error("Failed to toggle publish status:", err);
+        }
+    };
+
     if (!user) return null;
 
     const avatarUrl = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${encodeURIComponent(avatarConfig.seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
@@ -199,9 +212,16 @@ function UserDashboard() {
                                         </button>
                                         
                                         <label className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 p-3 rounded-xl cursor-pointer transition-colors border border-white/10 mt-auto">
-                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Publish</span>
+                                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                                                {story.is_published ? "Published 🌍" : "Private 🔒"}
+                                            </span>
                                             <div className="relative">
-                                                <input type="checkbox" className="sr-only peer" />
+                                                <input 
+                                                    type="checkbox" 
+                                                    className="sr-only peer" 
+                                                    checked={story.is_published || false}
+                                                    onChange={() => handleTogglePublish(story.id)}
+                                                />
                                                 <div className="w-9 h-5 bg-black border border-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#7c3aed] peer-checked:after:bg-white"></div>
                                             </div>
                                         </label>

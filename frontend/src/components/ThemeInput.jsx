@@ -26,11 +26,17 @@ function ThemeInput({ onSubmit }) {
     const [recentStories, setRecentStories] = useState([]);
     const [loadingStories, setLoadingStories] = useState(true);
     const [showAuthModal, setShowAuthModal] = useState(false);
+    const [authMode, setAuthMode] = useState('login');
+    const [manaPoints, setManaPoints] = useState(5);
 
     useEffect(() => {
-        const fetchRecent = async () => {
+        const fetchStories = async () => {
+            setLoadingStories(true);
             try {
-                const { data } = await axios.get(`${API_BASE_URL}/story/recent`);
+                const endpoint = user 
+                    ? `${API_BASE_URL}/story/user/${user.id}`
+                    : `${API_BASE_URL}/story/recent`;
+                const { data } = await axios.get(endpoint);
                 setRecentStories(data);
             } catch {
                 // silently fail
@@ -38,8 +44,24 @@ function ThemeInput({ onSubmit }) {
                 setLoadingStories(false);
             }
         };
-        fetchRecent();
-    }, []);
+        fetchStories();
+    }, [user]);
+
+    useEffect(() => {
+        const fetchMana = async () => {
+            if (user) {
+                try {
+                    const { data } = await axios.get(`${API_BASE_URL}/user/${user.id}/profile`);
+                    setManaPoints(data.mana_points);
+                } catch {
+                    // silently fail
+                }
+            }
+        };
+        fetchMana();
+        window.addEventListener('manaUpdate', fetchMana);
+        return () => window.removeEventListener('manaUpdate', fetchMana);
+    }, [user]);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -47,6 +69,7 @@ function ThemeInput({ onSubmit }) {
 
         // Auth gate — require login to create a story
         if (!user) {
+            setAuthMode('login');
             setShowAuthModal(true);
             return;
         }
@@ -56,17 +79,25 @@ function ThemeInput({ onSubmit }) {
             setError("Please enter a story theme");
             return;
         }
+
+        if (manaPoints <= 0) {
+            setError("Not enough Mana to cast this spell. Wait until tomorrow!");
+            return;
+        }
+
+        // Fire event to deduct mana optimistically in UI (or wait for next fetch)
         onSubmit(input, difficulty);
+        setTimeout(() => window.dispatchEvent(new Event('manaUpdate')), 1000);
     };
 
     const selectedDiff = DIFFICULTIES.find(d => d.value === difficulty) || DIFFICULTIES[1];
 
     return (
         <div className="relative min-h-screen bg-[#05020a] text-white selection:bg-[#7c3aed] selection:text-white">
-            <Navbar onLoginClick={() => setShowAuthModal(true)} />
+            <Navbar onLoginClick={(mode) => { setAuthMode(mode); setShowAuthModal(true); }} />
 
             {/* Auth Modal */}
-            {showAuthModal && <AuthModal onClose={() => setShowAuthModal(false)} />}
+            {showAuthModal && <AuthModal initialMode={authMode} onClose={() => setShowAuthModal(false)} />}
 
             {/* ── Hero Section ── */}
             <div className="relative h-[92vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden">
@@ -159,8 +190,9 @@ function ThemeInput({ onSubmit }) {
                                 <button
                                     type="submit"
                                     id="generate-story-btn"
-                                    title={!user ? "Login to generate a story" : "Generate story"}
-                                    className="w-10 h-10 flex items-center justify-center bg-[#7c3aed] text-white rounded-xl hover:bg-[#6d28d9] shadow-[0_0_16px_rgba(124,58,237,0.5)] transition-all duration-300 hover:scale-105 active:scale-95 shrink-0"
+                                    disabled={user && manaPoints <= 0}
+                                    title={!user ? "Login to generate a story" : (manaPoints <= 0 ? "Out of Mana" : "Generate story")}
+                                    className={`w-10 h-10 flex items-center justify-center text-white rounded-xl shadow-[0_0_16px_rgba(124,58,237,0.5)] transition-all duration-300 shrink-0 ${user && manaPoints <= 0 ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-[#7c3aed] hover:bg-[#6d28d9] hover:scale-105 active:scale-95'}`}
                                 >
                                     {!user ? (
                                         <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
@@ -175,7 +207,7 @@ function ThemeInput({ onSubmit }) {
                             </div>
 
                             {error && (
-                                <p className="absolute -bottom-7 left-4 text-red-400 font-medium text-xs">{error}</p>
+                                <p className={`absolute -bottom-7 left-4 font-medium text-xs ${error.includes('Mana') ? 'text-yellow-400 font-pixel' : 'text-red-400'}`}>{error}</p>
                             )}
                         </form>
                     </div>

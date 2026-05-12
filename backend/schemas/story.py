@@ -53,6 +53,7 @@ class RecentStoryResponse(BaseModel):
     theme: str
     cover_image: Optional[str] = None
     created_at: datetime
+    is_published: bool = False
 
     class Config:
         from_attributes = True

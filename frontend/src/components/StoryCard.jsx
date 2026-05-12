@@ -23,8 +23,8 @@ const StoryCard = ({ story, demo = false }) => {
     const colors = THEME_COLORS[theme] || DEFAULT_COLORS;
 
     // Use backend generated cover image if available, otherwise fallback
-    const seed = id ?? Math.floor(Math.random() * 9999);
-    const coverUrl = cover_image || `https://image.pollinations.ai/prompt/cinematic%20illustration%20of%20${encodeURIComponent(theme ?? 'adventure')}%20story%20dark%20fantasy%20digital%20art?width=400&height=220&seed=${seed}&nologo=true`;
+    const seed = Math.floor(Math.random() * 999999);
+    const coverUrl = cover_image || `https://image.pollinations.ai/prompt/16-bit+pixel+art+cover+for+${encodeURIComponent(theme ?? 'adventure')}+story?width=400&height=220&seed=${seed}&nologo=true`;
 
     const handleClick = () => {
         if (!demo && id) navigate(`/story/${id}`);
@@ -43,6 +43,7 @@ const StoryCard = ({ story, demo = false }) => {
                     alt={title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
+                    onError={(e) => { e.target.style.display = 'none'; }}
                 />
                 {/* Gradient overlay on image */}
                 <div className={`absolute inset-0 bg-gradient-to-t ${colors.bg} opacity-60`} />

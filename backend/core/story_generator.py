@@ -18,6 +18,8 @@ from fastapi import HTTPException
 from dotenv import load_dotenv
 import json
 import re
+from urllib.parse import quote
+import random
 
 load_dotenv()
 
@@ -50,7 +52,9 @@ class StoryGenerator:
             ]
         ).partial(format_instructions=story_parser.get_format_instructions())
 
+        print("1. Sending request to Groq...")
         raw_response = llm.invoke(prompt.invoke({"theme": theme}))
+        print("2. Response received from Groq!")
 
         response_text = raw_response
         if hasattr(raw_response, "content"):
@@ -80,12 +84,19 @@ class StoryGenerator:
             # print(f"DEBUG: Full response text for debugging: {response_text}")
             raise ValueError(f"Failed to parse story structure. Check logs.")
 
+        # Generate a single background image for the entire story
+        safe_theme = quote(theme)
+        safe_title = quote(story_structure.title)
+        seed = random.randint(1, 999999)
+        bg_url = f"https://image.pollinations.ai/prompt/16-bit+pixel+art+epic+background+for+a+story+about+{safe_theme}+titled+{safe_title}?width=1920&height=1080&nologo=true&seed={seed}"
+        cover_url = f"https://image.pollinations.ai/prompt/16-bit+pixel+art+cover+art+for+story+titled+{safe_title}+theme+{safe_theme}?width=1024&height=1024&nologo=true&seed={seed}"
+
         story_db = Story(
             session_id=session_id,
             user_id=user_id,
             title=story_structure.title,
             theme=theme,
-            cover_image=f"https://image.pollinations.ai/prompt/16-bit%20pixel%20art%20cover%20for%20story%20titled%20{story_structure.title}%20with%20theme%20{theme}?width=1024&height=1024&nologo=true"
+            cover_image=cover_url
         )
         db.add(story_db)
         db.commit()
@@ -96,19 +107,15 @@ class StoryGenerator:
         if isinstance(root_node_data, dict):
             root_node_data = StoryNodeLLM.model_validate(root_node_data)
 
-        # Save the story nodes recursively
-        cls._save_nodes_recursively(db, root_node_data, story_db, is_root=True)
+        # Save the story nodes recursively, passing the common background image
+        cls._save_nodes_recursively(db, root_node_data, story_db, bg_url, is_root=True)
 
         db.commit()
 
         return story_db.id
         
     @classmethod
-    def _save_nodes_recursively(cls, db: Session, parent_node: StoryNodeLLM, story_db: Story, is_root: bool = False) -> Node:
-        # Generate background image URL based on content
-        scene_preview = parent_node.content[:100]
-        bg_url = f"https://image.pollinations.ai/prompt/16-bit%20pixel%20art%20background%20for%20{story_db.theme}%20scene:%20{scene_preview}?width=1920&height=1080&nologo=true"
-
+    def _save_nodes_recursively(cls, db: Session, parent_node: StoryNodeLLM, story_db: Story, bg_url: str, is_root: bool = False) -> Node:
         node = Node(
             story_id=story_db.id,
             content=parent_node.content,
@@ -133,7 +140,7 @@ class StoryGenerator:
                 if isinstance(next_node_data, dict):
                     next_node_data = StoryNodeLLM.model_validate(next_node_data)
                 
-                child_node = cls._save_nodes_recursively(db, next_node_data, story_db, False)
+                child_node = cls._save_nodes_recursively(db, next_node_data, story_db, bg_url, False)
 
                 options_list.append(
                     {

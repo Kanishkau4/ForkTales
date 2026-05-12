@@ -6,6 +6,7 @@ function AuthModal({ onClose, initialMode = 'login' }) {
     const [mode, setMode] = useState(initialMode) // 'login' | 'signup'
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
     const [success, setSuccess] = useState('')
     const [loading, setLoading] = useState(false)
@@ -16,16 +17,22 @@ function AuthModal({ onClose, initialMode = 'login' }) {
         setSuccess('')
         setLoading(true)
 
+        const cleanEmail = email.trim().toLowerCase()
+
         try {
             if (mode === 'login') {
-                const { error } = await signIn(email, password)
+                const { error } = await signIn(cleanEmail, password)
                 if (error) throw error
                 onClose()
             } else {
-                const { error } = await signUp(email, password)
+                if (password !== confirmPassword) {
+                    throw new Error("Passwords do not match")
+                }
+                const { error } = await signUp(cleanEmail, password)
                 if (error) throw error
                 setSuccess('Account created! Check your email to confirm, then log in.')
                 setMode('login')
+                setConfirmPassword('')
             }
         } catch (err) {
             setError(err.message || 'Something went wrong')
@@ -91,8 +98,9 @@ function AuthModal({ onClose, initialMode = 'login' }) {
 
                     {/* Social Auth */}
                     <button
-                        onClick={() => {
-                            signInWithGoogle().catch(err => setError(err.message))
+                        onClick={async () => {
+                            const { error } = await signInWithGoogle()
+                            if (error) setError(error.message)
                         }}
                         className="w-full flex items-center justify-center gap-3 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-semibold text-white transition-all mb-6"
                     >
@@ -146,6 +154,24 @@ function AuthModal({ onClose, initialMode = 'login' }) {
                                 className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]/50 transition-all"
                             />
                         </div>
+
+                        {mode === 'signup' && (
+                            <div>
+                                <label className="block text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">
+                                    Confirm Password
+                                </label>
+                                <input
+                                    type="password"
+                                    id="auth-confirm-password"
+                                    value={confirmPassword}
+                                    onChange={e => setConfirmPassword(e.target.value)}
+                                    required
+                                    placeholder="••••••••"
+                                    minLength={6}
+                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 outline-none focus:border-[#7c3aed] focus:ring-1 focus:ring-[#7c3aed]/50 transition-all"
+                                />
+                            </div>
+                        )}
 
                         {error && (
                             <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">

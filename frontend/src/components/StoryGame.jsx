@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
+import confetti from "canvas-confetti";
 import AnimatedSprite from "./AnimatedSprite";
 import mushroomIdle from "../assets/sprites/Mushroom-Idle.png";
 import mushroomRun from "../assets/sprites/Mushroom-Run.png";
 import mushroomDie from "../assets/sprites/Mushroom-Die.png";
+import mushroomHit from "../assets/sprites/Mushroom-Hit.png";
 
 const TypewriterText = ({ text, speed = 15 }) => {
     const [displayedText, setDisplayedText] = useState("");
@@ -47,10 +49,15 @@ function StoryGame({ story, onNewStory }) {
             const rootNodeID = story.root_node.id;
             setCurrentNodeId(rootNodeID);
 
-            // Generate a thematic background
-            const theme = story.theme || "adventure";
-            const initialScene = story.root_node.content.substring(0, 100);
-            setBgUrl(`https://image.pollinations.ai/prompt/16-bit%20pixel%20art%20background%20for%20${encodeURIComponent(theme)}%20scene:%20${encodeURIComponent(initialScene)}?width=1920&height=1080&nologo=true&seed=${story.id}`);
+            // Generate a thematic background from cover or pollinations
+            if (story.root_node.background_image) {
+                setBgUrl(story.root_node.background_image);
+            } else {
+                const theme = encodeURIComponent(story.theme || "adventure");
+                const title = encodeURIComponent(story.title || "story");
+                const randomSeed = Math.floor(Math.random() * 999999);
+                setBgUrl(`https://image.pollinations.ai/prompt/16-bit+pixel+art+epic+background+for+${theme}+titled+${title}?width=1920&height=1080&nologo=true&seed=${randomSeed}`);
+            }
         }
     }, [story]);
 
@@ -68,13 +75,45 @@ function StoryGame({ story, onNewStory }) {
                 if (node.background_image) {
                     setBgUrl(node.background_image);
                 } else {
-                    const theme = story.theme || "adventure";
-                    const scene = node.content.substring(0, 100);
-                    setBgUrl(`https://image.pollinations.ai/prompt/16-bit%20pixel%20art%20background%20for%20${encodeURIComponent(theme)}%20scene:%20${encodeURIComponent(scene)}?width=1920&height=1080&nologo=true&seed=${currentNodeId}`);
+                    const theme = encodeURIComponent(story.theme || "adventure");
+                    const scene = encodeURIComponent(node.content.substring(0, 80));
+                    const randomSeed = Math.floor(Math.random() * 999999);
+                    setBgUrl(`https://image.pollinations.ai/prompt/16-bit+pixel+art+background+for+${theme}+${scene}?width=1920&height=1080&nologo=true&seed=${randomSeed}`);
                 }
             }
         }
     }, [currentNodeId, story]);
+
+    useEffect(() => {
+        let interval;
+        if (isWinningEnding) {
+            const duration = 15 * 1000;
+            const animationEnd = Date.now() + duration;
+            const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 100 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            interval = setInterval(function () {
+                const timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                const particleCount = 50 * (timeLeft / duration);
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } });
+                confetti({ ...defaults, particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } });
+            }, 250);
+        }
+
+        return () => {
+            if (interval) {
+                clearInterval(interval);
+            }
+        };
+    }, [isWinningEnding]);
 
     const chooseOption = (optionId) => {
         setCurrentNodeId(optionId);
@@ -106,8 +145,8 @@ function StoryGame({ story, onNewStory }) {
                         <div className="relative">
                             <div className={`absolute -inset-6 rounded-full blur-2xl animate-pulse ${isWinningEnding ? 'bg-green-500/20' : 'bg-red-500/20'}`} />
                             <AnimatedSprite
-                                spriteUrl={isWinningEnding ? mushroomRun : mushroomDie}
-                                frameCount={isWinningEnding ? 8 : 4}
+                                spriteUrl={isWinningEnding ? mushroomHit : mushroomDie}
+                                frameCount={isWinningEnding ? 5 : 15}
                                 width={120}
                                 height={120}
                                 animationDuration={isWinningEnding ? "0.8s" : "1.5s"}

@@ -1,10 +1,45 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import confetti from "canvas-confetti";
 import AnimatedSprite from "./AnimatedSprite";
+
+// Mushroom
 import mushroomIdle from "../assets/sprites/Mushroom-Idle.png";
-import mushroomRun from "../assets/sprites/Mushroom-Run.png";
 import mushroomDie from "../assets/sprites/Mushroom-Die.png";
 import mushroomHit from "../assets/sprites/Mushroom-Hit.png";
+
+// Human Soldier
+import soldierIdle from "../assets/sprites/Human_Soldier_Sword_Shield_Idle.png";
+import soldierDeath from "../assets/sprites/Human_Soldier_Sword_Shield_Death.png";
+import soldierJump from "../assets/sprites/Human_Soldier_Sword_Shield_Jump.png";
+
+// Monster Slime
+import slimeIdle from "../assets/sprites/Monster_Slime_Idle.png";
+import slimeDeath from "../assets/sprites/Monster_Slime_Death.png";
+import slimeJump from "../assets/sprites/Monster_Slime_Jump.png";
+
+const SPRITE_ROSTER = [
+    {
+        name: "Mushroom",
+        sizeMultiplier: 1,
+        idle: { src: mushroomIdle, frames: 7, duration: "1.2s" },
+        die: { src: mushroomDie, frames: 15, duration: "1.5s" },
+        win: { src: mushroomHit, frames: 5, duration: "0.8s" },
+    },
+    {
+        name: "Human Soldier",
+        sizeMultiplier: 1.6,
+        idle: { src: soldierIdle, frames: 6, duration: "1.0s" },
+        die: { src: soldierDeath, frames: 10, duration: "1.4s" },
+        win: { src: soldierJump, frames: 6, duration: "0.6s" },
+    },
+    {
+        name: "Monster Slime",
+        sizeMultiplier: 1.6,
+        idle: { src: slimeIdle, frames: 6, duration: "1.0s" },
+        die: { src: slimeDeath, frames: 10, duration: "1.2s" },
+        win: { src: slimeJump, frames: 6, duration: "0.5s" },
+    },
+];
 
 const TypewriterText = ({ text, speed = 15 }) => {
     const [displayedText, setDisplayedText] = useState("");
@@ -43,6 +78,13 @@ function StoryGame({ story, onNewStory }) {
     const [isEnding, setIsEnding] = useState(false);
     const [isWinningEnding, setIsWinningEnding] = useState(false);
     const [bgUrl, setBgUrl] = useState("");
+
+    // Pick a random character once per story session
+    const character = useMemo(
+        () => SPRITE_ROSTER[Math.floor(Math.random() * SPRITE_ROSTER.length)],
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+        [story?.id]
+    );
 
     useEffect(() => {
         if (story && story.root_node) {
@@ -145,11 +187,11 @@ function StoryGame({ story, onNewStory }) {
                         <div className="relative">
                             <div className={`absolute -inset-6 rounded-full blur-2xl animate-pulse ${isWinningEnding ? 'bg-green-500/20' : 'bg-red-500/20'}`} />
                             <AnimatedSprite
-                                spriteUrl={isWinningEnding ? mushroomHit : mushroomDie}
-                                frameCount={isWinningEnding ? 5 : 15}
-                                width={120}
-                                height={120}
-                                animationDuration={isWinningEnding ? "0.8s" : "1.5s"}
+                                spriteUrl={isWinningEnding ? character.win.src : character.die.src}
+                                frameCount={isWinningEnding ? character.win.frames : character.die.frames}
+                                width={Math.round(120 * character.sizeMultiplier)}
+                                height={Math.round(120 * character.sizeMultiplier)}
+                                animationDuration={isWinningEnding ? character.win.duration : character.die.duration}
                                 className="relative z-10 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
                             />
                         </div>
@@ -213,11 +255,11 @@ function StoryGame({ story, onNewStory }) {
                             Narrator
                         </div>
                         <AnimatedSprite
-                            spriteUrl={mushroomIdle}
-                            frameCount={7}
-                            width={96}
-                            height={96}
-                            animationDuration="1.2s"
+                            spriteUrl={character.idle.src}
+                            frameCount={character.idle.frames}
+                            width={Math.round(96 * character.sizeMultiplier)}
+                            height={Math.round(96 * character.sizeMultiplier)}
+                            animationDuration={character.idle.duration}
                             className="drop-shadow-[0_0_15px_rgba(124,58,237,0.4)]"
                         />
                         <div className="w-16 h-2 bg-black/60 rounded-[50%] blur-[2px] mt-2" />
@@ -226,13 +268,13 @@ function StoryGame({ story, onNewStory }) {
                     <div className="prose prose-invert max-w-none flex-1 w-full">
                         <div className="md:hidden flex items-center gap-3 mb-4 border-b border-white/10 pb-4">
                             <AnimatedSprite
-                                spriteUrl={mushroomIdle}
-                                frameCount={7}
-                                width={40}
-                                height={40}
-                                animationDuration="1.2s"
+                                spriteUrl={character.idle.src}
+                                frameCount={character.idle.frames}
+                                width={Math.round(40 * character.sizeMultiplier)}
+                                height={Math.round(40 * character.sizeMultiplier)}
+                                animationDuration={character.idle.duration}
                             />
-                            <span className="text-xs font-bold text-[#a78bfa] uppercase tracking-widest">Narrator</span>
+                            <span className="text-xs font-bold text-[#a78bfa] uppercase tracking-widest">{character.name}</span>
                         </div>
                         <p className="text-lg md:text-2xl text-gray-200 leading-relaxed font-light tracking-wide md:leading-[1.8] min-h-[100px]">
                             {nodes?.content ? <TypewriterText text={nodes?.content} /> : ""}

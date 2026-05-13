@@ -17,17 +17,48 @@ const DIFFICULTIES = [
 
 const GENRE_CHIPS = ["Fantasy", "Sci-Fi", "Mystery", "Horror", "Adventure", "Romance"];
 
+const PLACEHOLDERS = [
+    "Space Pirates)",
+    "Dragon Quest)",
+    "Haunted Mansion)",
+    "Cyberpunk City)",
+    "Lost in the Woods)"
+];
+
+const BASE_TEXT = "Enter your story theme... (e.g. ";
+
 function ThemeInput({ onSubmit }) {
     const { user } = useAuth();
     const [theme, setTheme] = useState("");
     const [error, setError] = useState("");
-    const [difficulty, setDifficulty] = useState("medium");
+    const [difficulty, setDifficulty] = useState("easy");
     const [diffOpen, setDiffOpen] = useState(false);
     const [recentStories, setRecentStories] = useState([]);
     const [loadingStories, setLoadingStories] = useState(true);
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMode, setAuthMode] = useState('login');
     const [manaPoints, setManaPoints] = useState(5);
+    const [placeholderText, setPlaceholderText] = useState("");
+    const [typingIndex, setTypingIndex] = useState(0);
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    useEffect(() => {
+        const currentText = PLACEHOLDERS[typingIndex];
+        const typingSpeed = isDeleting ? 30 : 80;
+
+        const timeout = setTimeout(() => {
+            if (!isDeleting && placeholderText === currentText) {
+                setTimeout(() => setIsDeleting(true), 2000);
+            } else if (isDeleting && placeholderText === "") {
+                setIsDeleting(false);
+                setTypingIndex((prev) => (prev + 1) % PLACEHOLDERS.length);
+            } else {
+                setPlaceholderText(currentText.substring(0, placeholderText.length + (isDeleting ? -1 : 1)));
+            }
+        }, typingSpeed);
+
+        return () => clearTimeout(timeout);
+    }, [placeholderText, isDeleting, typingIndex]);
 
     useEffect(() => {
         const fetchStories = async () => {
@@ -150,7 +181,7 @@ function ThemeInput({ onSubmit }) {
                                 <input
                                     type="text"
                                     id="story-theme-input"
-                                    placeholder="Enter your story theme... (e.g. Space Pirates, Dragon Quest)"
+                                    placeholder={`${BASE_TEXT}${placeholderText}`}
                                     value={theme}
                                     onChange={(e) => setTheme(e.target.value)}
                                     className="flex-1 bg-transparent border-none outline-none text-sm md:text-base font-medium text-white placeholder:text-gray-600 h-10"

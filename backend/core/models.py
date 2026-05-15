@@ -13,4 +13,5 @@ class StoryNodeLLM(BaseModel):
 
 class StoryLLMResponse(BaseModel):
     title: str = Field(description="The title of the story")
+    image_prompt: str = Field(description="A short 1-sentence English description of the story setting for AI image generation (e.g. 'A dark forest with glowing mushrooms')")
     rootNode: StoryNodeLLM = Field(description="The root node of the story")

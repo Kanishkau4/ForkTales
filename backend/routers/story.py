@@ -94,12 +94,13 @@ def create_story(
         user_id=request.user_id,
         user_email=request.user_email,
         theme=request.theme,
-        difficulty=request.difficulty
+        difficulty=request.difficulty,
+        language=request.language
     )
 
     return job
 
-def generate_story_task(job_id: str, session_id: str, user_id: str, user_email: str, theme: str, difficulty: str = "medium"):
+def generate_story_task(job_id: str, session_id: str, user_id: str, user_email: str, theme: str, difficulty: str = "easy", language: str = "english"):
     db = SessionLocal()
 
     try:
@@ -112,7 +113,7 @@ def generate_story_task(job_id: str, session_id: str, user_id: str, user_email: 
             db.commit()
             db.refresh(job)
         
-            story_id = StoryGenerator.generate_story(db, session_id, user_id, theme, difficulty)
+            story_id = StoryGenerator.generate_story(db, session_id, user_id, theme, difficulty, language)
 
             # Update job status
             job.story_id = story_id

@@ -1,0 +1,50 @@
+export const translations = {
+    english: {
+        badge: "AI-Powered Interactive Stories",
+        heroTitle1: "The World's First",
+        heroTitle2: "AI Story Adventure",
+        heroSubtitle: "Choose your path. Shape your fate. Every story is yours.",
+        inputPlaceholderBase: "Enter your story theme... (e.g. ",
+        difficultyLabel: "Difficulty",
+        generateBtn: "Generate story",
+        loginToGenerate: "Login to generate a story",
+        outOfMana: "Out of Mana",
+        signIn: "Sign in",
+        signInToGenerate: "to generate your own story",
+        storiesTitle: "Stories People Love",
+        storiesSubtitle: "Dive into an adventure someone else started — or create your own",
+        themeError: "Please enter a story theme",
+        manaError: "Not enough Mana to cast this spell. Wait until tomorrow!",
+        genres: ["Fantasy", "Sci-Fi", "Mystery", "Horror", "Adventure", "Romance"],
+        placeholders: ["Space Pirates)", "Dragon Quest)", "Haunted Mansion)", "Cyberpunk City)", "Lost in the Woods)"],
+        difficulties: [
+            { value: "easy", label: "Easy", desc: "3–4 levels, perfect for beginners" },
+            { value: "medium", label: "Medium", desc: "5–6 levels, balanced challenge" },
+            { value: "hard", label: "Hard", desc: "7–8 levels, complex twists" },
+        ]
+    },
+    sinhala: {
+        badge: "AI මගින් ක්‍රියාත්මක වන අන්තර්ක්‍රියාකාරී කථා",
+        heroTitle1: "ලොව ප්‍රථම",
+        heroTitle2: "AI කථා වික්‍රමය",
+        heroSubtitle: "ඔබේ මාවත තෝරන්න. ඔබේ ඉරණම තීරණය කරන්න. සෑම කතාවක්ම ඔබගේම වේ.",
+        inputPlaceholderBase: "ඔබේ කතාවේ තේමාව ඇතුළත් කරන්න... (උදා: ",
+        difficultyLabel: "අපහසුතාව",
+        generateBtn: "කතාව සාදන්න",
+        loginToGenerate: "කතාවක් සෑදීමට ඇතුළු වන්න",
+        outOfMana: "මනා අවසන්",
+        signIn: "ඇතුළු වන්න",
+        signInToGenerate: "ඔබේම කතාවක් නිර්මාණය කිරීමට",
+        storiesTitle: "අන් අය කැමති වූ කථා",
+        storiesSubtitle: "වෙනත් කෙනෙකු ආරම්භ කළ වික්‍රමයකට පිවිසෙන්න — නැතහොත් ඔබේම එකක් සාදන්න",
+        themeError: "කරුණාකර කතාවේ තේමාව ඇතුළත් කරන්න",
+        manaError: "මෙම මන්ත්‍රය දැමීමට ප්‍රමාණවත් මනා නැත. හෙට වන තෙක් රැඳී සිටින්න!",
+        genres: ["මනඃකල්පිත", "විද්‍යා ප්‍රබන්ධ", "අභිරහස්", "භීෂණ", "වික්‍රමාන්විත", "ආදර"],
+        placeholders: ["අභ්‍යවකාශ කොල්ලකරුවන්)", "ඩ්‍රැගන් ගවේෂණය)", "භීෂණ මන්දිරය)", "සයිබර්පන්ක් නගරය)", "වනාන්තරයේ අතරමං වීම)"],
+        difficulties: [
+            { value: "easy", label: "ලේසියි", desc: "මට්ටම් 3-4, ආරම්භකයින් සඳහා සුදුසුයි" },
+            { value: "medium", label: "මධ්‍යම", desc: "මට්ටම් 5-6, සමබර අභියෝගයක්" },
+            { value: "hard", label: "අමාරුයි", desc: "මට්ටම් 7-8, සංකීර්ණ හැරවුම්" },
+        ]
+    }
+};

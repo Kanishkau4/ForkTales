@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { API_BASE_URL } from '../util';
 import manaGif from '../assets/mana-spining.gif';
 
 const Navbar = ({ onLoginClick }) => {
   const [scrolled, setScrolled] = useState(false);
   const { user, signOut } = useAuth();
+  const { language, toggleLanguage } = useLanguage();
   const [avatarUrl, setAvatarUrl] = useState('');
   const [manaPoints, setManaPoints] = useState(5);
 
@@ -76,6 +78,15 @@ const Navbar = ({ onLoginClick }) => {
 
       {/* Right Actions */}
       <div className="flex items-center gap-3">
+        {/* Language Toggle */}
+        <button
+          onClick={toggleLanguage}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-white/10 hover:bg-white/5 transition-colors text-xs font-semibold uppercase tracking-wider text-gray-300"
+          title={`Switch to ${language === 'english' ? 'Sinhala' : 'English'}`}
+        >
+          {language === 'english' ? 'EN' : 'සිංහල'}
+        </button>
+
         {!user ? (
           <div className="flex items-center gap-3">
             <button onClick={() => onLoginClick('login')} className="px-5 py-2 rounded-xl text-sm font-semibold border border-white/20 hover:bg-white hover:text-black transition-all duration-200">

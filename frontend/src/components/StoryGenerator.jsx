@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../util";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import LoadingStatus from "./LoadingStatus";
 import ThemeInput from "./ThemeInput";
 import StoryGame from "./StoryGame";
@@ -15,6 +16,7 @@ function StoryGenerator() {
     const [jobId, setJobId] = useState(null);
     const [jobStatus, setJobStatus] = useState(null);
     const { user } = useAuth();
+    const { language } = useLanguage();
 
     useEffect(() => {
         let pullInterval;
@@ -34,6 +36,7 @@ function StoryGenerator() {
             const response = await axios.post(`${API_BASE_URL}/story/create`, { 
                 theme, 
                 difficulty,
+                language,
                 user_id: user?.id,
                 user_email: user?.email
             });

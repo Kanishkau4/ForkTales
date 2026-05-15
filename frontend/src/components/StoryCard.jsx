@@ -43,6 +43,8 @@ const StoryCard = ({ story, demo = false }) => {
                     alt={title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     loading="lazy"
+                    referrerPolicy="no-referrer"
+                    crossOrigin="anonymous"
                     onError={(e) => { e.target.style.display = 'none'; }}
                 />
                 {/* Gradient overlay on image */}

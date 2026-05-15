@@ -8,27 +8,16 @@ import dragonSprite from "../assets/sprites/dragon_fly.png";
 import heroVideo from "../assets/Hero_Video.mp4";
 import { API_BASE_URL } from "../util";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
+import { translations } from "../util/translations";
 
-const DIFFICULTIES = [
-    { value: "easy", label: "Easy", desc: "3–4 levels, perfect for beginners" },
-    { value: "medium", label: "Medium", desc: "5–6 levels, balanced challenge" },
-    { value: "hard", label: "Hard", desc: "7–8 levels, complex twists" },
-];
-
-const GENRE_CHIPS = ["Fantasy", "Sci-Fi", "Mystery", "Horror", "Adventure", "Romance"];
-
-const PLACEHOLDERS = [
-    "Space Pirates)",
-    "Dragon Quest)",
-    "Haunted Mansion)",
-    "Cyberpunk City)",
-    "Lost in the Woods)"
-];
-
-const BASE_TEXT = "Enter your story theme... (e.g. ";
+// Removed static constants — now handled via translations utility
 
 function ThemeInput({ onSubmit }) {
     const { user } = useAuth();
+    const { language } = useLanguage();
+    const t = translations[language];
+
     const [theme, setTheme] = useState("");
     const [error, setError] = useState("");
     const [difficulty, setDifficulty] = useState("easy");
@@ -43,7 +32,7 @@ function ThemeInput({ onSubmit }) {
     const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
-        const currentText = PLACEHOLDERS[typingIndex];
+        const currentText = t.placeholders[typingIndex];
         const typingSpeed = isDeleting ? 30 : 80;
 
         const timeout = setTimeout(() => {
@@ -51,14 +40,14 @@ function ThemeInput({ onSubmit }) {
                 setTimeout(() => setIsDeleting(true), 2000);
             } else if (isDeleting && placeholderText === "") {
                 setIsDeleting(false);
-                setTypingIndex((prev) => (prev + 1) % PLACEHOLDERS.length);
+                setTypingIndex((prev) => (prev + 1) % t.placeholders.length);
             } else {
                 setPlaceholderText(currentText.substring(0, placeholderText.length + (isDeleting ? -1 : 1)));
             }
         }, typingSpeed);
 
         return () => clearTimeout(timeout);
-    }, [placeholderText, isDeleting, typingIndex]);
+    }, [placeholderText, isDeleting, typingIndex, t.placeholders]);
 
     useEffect(() => {
         const fetchStories = async () => {
@@ -107,12 +96,12 @@ function ThemeInput({ onSubmit }) {
 
         const input = theme.trim();
         if (!input) {
-            setError("Please enter a story theme");
+            setError(t.themeError);
             return;
         }
 
         if (manaPoints <= 0) {
-            setError("Not enough Mana to cast this spell. Wait until tomorrow!");
+            setError(t.manaError);
             return;
         }
 
@@ -121,7 +110,7 @@ function ThemeInput({ onSubmit }) {
         setTimeout(() => window.dispatchEvent(new Event('manaUpdate')), 1000);
     };
 
-    const selectedDiff = DIFFICULTIES.find(d => d.value === difficulty) || DIFFICULTIES[1];
+    const selectedDiff = t.difficulties.find(d => d.value === difficulty) || t.difficulties[1];
 
     return (
         <div className="relative min-h-screen bg-[#05020a] text-white selection:bg-[#7c3aed] selection:text-white">
@@ -150,19 +139,19 @@ function ThemeInput({ onSubmit }) {
                     {/* Badge */}
                     <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/15 px-4 py-1.5 rounded-full text-xs font-semibold text-gray-200 tracking-widest uppercase">
                         <span className="w-1.5 h-1.5 rounded-full bg-[#7c3aed] animate-pulse inline-block" />
-                        AI-Powered Interactive Stories
+                        {t.badge}
                     </div>
 
                     {/* Heading */}
                     <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.8)]">
-                        The World's First <br />
+                        {t.heroTitle1} <br />
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#a78bfa] via-white to-[#7c3aed]">
-                            AI Story Adventure
+                            {t.heroTitle2}
                         </span>
                     </h1>
 
                     <p className="text-base md:text-lg text-gray-300 tracking-wide max-w-xl mx-auto drop-shadow-md">
-                        Choose your path. Shape your fate. Every story is yours.
+                        {t.heroSubtitle}
                     </p>
 
                     {/* Input Box */}
@@ -181,7 +170,7 @@ function ThemeInput({ onSubmit }) {
                                 <input
                                     type="text"
                                     id="story-theme-input"
-                                    placeholder={`${BASE_TEXT}${placeholderText}`}
+                                    placeholder={`${t.inputPlaceholderBase}${placeholderText}`}
                                     value={theme}
                                     onChange={(e) => setTheme(e.target.value)}
                                     className="flex-1 bg-transparent border-none outline-none text-sm md:text-base font-medium text-white placeholder:text-gray-600 h-10"
@@ -202,7 +191,7 @@ function ThemeInput({ onSubmit }) {
                                     </button>
                                     {diffOpen && (
                                         <div className="absolute right-0 top-full mt-2 w-52 bg-[#111]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
-                                            {DIFFICULTIES.map(d => (
+                                            {t.difficulties.map(d => (
                                                 <button
                                                     key={d.value}
                                                     type="button"
@@ -222,7 +211,7 @@ function ThemeInput({ onSubmit }) {
                                     type="submit"
                                     id="generate-story-btn"
                                     disabled={user && manaPoints <= 0}
-                                    title={!user ? "Login to generate a story" : (manaPoints <= 0 ? "Out of Mana" : "Generate story")}
+                                    title={!user ? t.loginToGenerate : (manaPoints <= 0 ? t.outOfMana : t.generateBtn)}
                                     className={`w-10 h-10 flex items-center justify-center text-white rounded-xl shadow-[0_0_16px_rgba(124,58,237,0.5)] transition-all duration-300 shrink-0 ${user && manaPoints <= 0 ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-[#7c3aed] hover:bg-[#6d28d9] hover:scale-105 active:scale-95'}`}
                                 >
                                     {!user ? (
@@ -246,13 +235,13 @@ function ThemeInput({ onSubmit }) {
                     {/* Not logged in hint */}
                     {!user && (
                         <p className="text-gray-600 text-xs pt-2">
-                            <button onClick={() => setShowAuthModal(true)} className="text-[#a78bfa] hover:underline">Sign in</button> to generate your own story
+                            <button onClick={() => setShowAuthModal(true)} className="text-[#a78bfa] hover:underline">{t.signIn}</button> {t.signInToGenerate}
                         </p>
                     )}
 
                     {/* Genre chips */}
                     <div className="flex flex-wrap justify-center gap-2 pt-1">
-                        {GENRE_CHIPS.map(g => (
+                        {t.genres.map(g => (
                             <button
                                 key={g}
                                 onClick={() => setTheme(g)}
@@ -269,9 +258,9 @@ function ThemeInput({ onSubmit }) {
             <div id="stories" className="relative z-10 max-w-7xl mx-auto px-6 pb-24 space-y-10">
                 <div className="text-center space-y-2">
                     <h2 className="text-2xl md:text-4xl font-bold tracking-tight">
-                        Stories People Love
+                        {t.storiesTitle}
                     </h2>
-                    <p className="text-gray-500 text-sm">Dive into an adventure someone else started — or create your own</p>
+                    <p className="text-gray-500 text-sm">{t.storiesSubtitle}</p>
                 </div>
 
                 {loadingStories ? (

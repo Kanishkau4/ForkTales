@@ -30,7 +30,8 @@ class StorySchema(BaseModel):
 
 class CreateStoryRequest(BaseModel):
     theme: str
-    difficulty: str = "medium"  # easy | medium | hard
+    difficulty: str = "easy"  # easy | medium | hard
+    language: str = "english"   # english | sinhala
     user_id: Optional[str] = None
     user_email: Optional[str] = None
 

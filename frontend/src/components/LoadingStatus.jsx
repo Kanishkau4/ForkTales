@@ -2,29 +2,29 @@ import React, { useMemo } from 'react';
 import AnimatedSprite from './AnimatedSprite';
 
 // Mushroom
-import mushroomRun  from '../assets/sprites/Mushroom-Run.png';
+import mushroomRun from '../assets/sprites/Mushroom-Run.png';
 
 // Human Soldier
-import soldierWalk  from '../assets/sprites/Human_Soldier_Sword_Shield_Walk.png';
+import soldierWalk from '../assets/sprites/Human_Soldier_Sword_Shield_Walk.png';
 
 // Monster Slime
-import slimeWalk  from '../assets/sprites/Monster_Slime_Walk.png';
+import slimeWalk from '../assets/sprites/Monster_Slime_Walk.png';
 
 const SPRITE_ROSTER = [
     {
         name: "Mushroom",
         sizeMultiplier: 1,
-        walk: { src: mushroomRun,  frames: 8,  duration: "0.8s" },
+        walk: { src: mushroomRun, frames: 8, duration: "0.8s" },
     },
     {
         name: "Human Soldier",
-        sizeMultiplier: 1.4,
-        walk: { src: soldierWalk,  frames: 8,  duration: "0.7s" },
+        sizeMultiplier: 1.8,
+        walk: { src: soldierWalk, frames: 8, duration: "0.7s" },
     },
     {
         name: "Monster Slime",
-        sizeMultiplier: 1.3,
-        walk: { src: slimeWalk,  frames: 8, duration: "0.7s" },
+        sizeMultiplier: 1.8,
+        walk: { src: slimeWalk, frames: 8, duration: "0.7s" },
     },
 ];
 

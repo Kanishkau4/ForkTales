@@ -27,14 +27,14 @@ const SPRITE_ROSTER = [
     },
     {
         name: "Human Soldier",
-        sizeMultiplier: 1.6,
+        sizeMultiplier: 1.8,
         idle: { src: soldierIdle, frames: 6, duration: "1.0s" },
         die: { src: soldierDeath, frames: 10, duration: "1.4s" },
         win: { src: soldierJump, frames: 6, duration: "0.6s" },
     },
     {
         name: "Monster Slime",
-        sizeMultiplier: 1.6,
+        sizeMultiplier: 1.8,
         idle: { src: slimeIdle, frames: 6, duration: "1.0s" },
         die: { src: slimeDeath, frames: 10, duration: "1.2s" },
         win: { src: slimeJump, frames: 6, duration: "0.5s" },

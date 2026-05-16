@@ -1,4 +1,5 @@
 import resend
+# pyrefly: ignore [missing-import]
 from core.config import settings
 
 if settings.RESEND_API_KEY:

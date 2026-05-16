@@ -10,6 +10,9 @@ import { API_BASE_URL } from "../util";
 import { useAuth } from "../context/AuthContext";
 import { useLanguage } from "../context/LanguageContext";
 import { translations } from "../util/translations";
+import catGif from "../assets/cat-walking-white.gif";
+import groundTile from "../assets/ground_tile.png";
+import grassTile from "../assets/grass_tile.webp";
 
 // Removed static constants — now handled via translations utility
 
@@ -53,7 +56,7 @@ function ThemeInput({ onSubmit }) {
         const fetchStories = async () => {
             setLoadingStories(true);
             try {
-                const endpoint = user 
+                const endpoint = user
                     ? `${API_BASE_URL}/story/user/${user.id}`
                     : `${API_BASE_URL}/story/recent`;
                 const { data } = await axios.get(endpoint);
@@ -143,7 +146,7 @@ function ThemeInput({ onSubmit }) {
                     </div>
 
                     {/* Heading */}
-                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold leading-tight tracking-tight text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.8)]">
+                    <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold font-retro leading-tight tracking-tight text-white drop-shadow-[0_2px_20px_rgba(0,0,0,0.8)]" style={{ fontFamily: '"Pixelify Sans", system-ui' }}>
                         {t.heroTitle1} <br />
                         <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#a78bfa] via-white to-[#7c3aed]">
                             {t.heroTitle2}
@@ -257,7 +260,7 @@ function ThemeInput({ onSubmit }) {
             {/* ── Recent Stories Section ── */}
             <div id="stories" className="relative z-10 max-w-7xl mx-auto px-6 pb-24 space-y-10">
                 <div className="text-center space-y-2">
-                    <h2 className="text-2xl md:text-4xl font-bold tracking-tight">
+                    <h2 className="text-2xl md:text-4xl font-bold tracking-tight" style={{ fontFamily: '"Pixelify Sans", system-ui' }}>
                         {t.storiesTitle}
                     </h2>
                     <p className="text-gray-500 text-sm">{t.storiesSubtitle}</p>
@@ -297,6 +300,71 @@ function ThemeInput({ onSubmit }) {
 
             {/* Scanline CRT effect */}
             <div className="fixed inset-0 pointer-events-none z-[60] opacity-[0.025] bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.04),rgba(0,255,0,0.01),rgba(0,0,255,0.04))] bg-[length:100%_2px,3px_100%]" />
+
+            {/* ── Animated Retro Footer ── */}
+            <footer className="relative w-full overflow-hidden bg-[#05020a] pt-32 pb-0">
+                {/* Night Sky with Stars */}
+                <div className="absolute inset-0 pointer-events-none opacity-40">
+                    {[...Array(20)].map((_, i) => (
+                        <div
+                            key={i}
+                            className="absolute w-1 h-1 bg-white rounded-full animate-star"
+                            style={{
+                                top: `${Math.random() * 60}%`,
+                                left: `${Math.random() * 100}%`,
+                                '--duration': `${2 + Math.random() * 4}s`,
+                                opacity: 0.2 + Math.random() * 0.8
+                            }}
+                        />
+                    ))}
+                </div>
+
+                {/* Scenery Container */}
+                <div className="relative h-48 w-full">
+                    {/* Grass layer (Moving) */}
+                    <div 
+                        className="absolute bottom-16 left-0 w-full h-8 animate-scroll-left z-10 pixelated opacity-90"
+                        style={{ 
+                            backgroundImage: `url(${grassTile})`, 
+                            backgroundRepeat: 'repeat-x', 
+                            backgroundSize: 'auto 100%' 
+                        }}
+                    />
+                    
+                    {/* Ground layer (Moving) */}
+                    <div 
+                        className="absolute bottom-0 left-0 w-full h-16 animate-scroll-left z-10 pixelated"
+                        style={{ 
+                            backgroundImage: `url(${groundTile})`, 
+                            backgroundRepeat: 'repeat-x', 
+                            backgroundSize: 'auto 100%' 
+                        }}
+                    />
+
+                    {/* Walking Cat */}
+                    <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-20">
+                        <img 
+                            src={catGif} 
+                            alt="Walking Cat" 
+                            className="w-16 h-16 object-contain pixelated drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]" 
+                        />
+                    </div>
+                </div>
+
+                {/* Footer Credits */}
+                <div className="relative z-30 py-8 text-center border-t border-white/5 bg-black/50 backdrop-blur-md">
+                    <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <p className="text-[10px] font-pixel text-gray-500 uppercase tracking-[0.2em]">
+                            ForkTales © 2026 • Infinite Stories await
+                        </p>
+                        <div className="flex gap-6 text-[10px] font-pixel text-gray-600 uppercase tracking-widest">
+                            <a href="#" className="hover:text-[#a78bfa] transition-colors">Privacy</a>
+                            <a href="#" className="hover:text-[#a78bfa] transition-colors">Terms</a>
+                            <a href="#" className="hover:text-[#a78bfa] transition-colors">Discord</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 }

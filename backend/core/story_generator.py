@@ -43,7 +43,7 @@ class StoryGenerator:
                 google_api_key=settings.GEMINI_API_KEY,
             )
         return ChatGroq(
-            model="llama-3.3-70b-versatile",
+            model="meta-llama/llama-4-scout-17b-16e-instruct",
         )
 
     @classmethod

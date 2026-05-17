@@ -14,12 +14,61 @@ import catGif from "../assets/cat-walking-white.gif";
 import groundTile from "../assets/ground_tile.png";
 import grassTile from "../assets/grass_tile.webp";
 
+const PixelFlower = ({ color = "#ff77ff", className = "" }) => (
+    <svg width="48" height="48" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" className={`pixelated ${className}`}>
+        {/* 1. Dark Outline Silhouette Base */}
+        <path d="M5 2h1v1H5zm5 0h1v1h-1z M4 3h3v1H4zm3 0h3v1H7zm2 0h3v1H9z M3 4h10v1H3z M3 5h10v1H3z M4 6h8v1H4z M5 7h6v1H5z M6 8h4v1H6z M7 9h2v1H7z M6 10h4v1H6z M4 11h8v1H4z M2 12h12v1H2z M3 13h10v1H3z M4 14h8v1H4z M6 15h4v1H6z" fill="#14151f" />
+
+        {/* 2. Foliage Base (Mid Green) */}
+        <path d="M7 10h2v1H7z M5 11h6v1H5z M3 12h10v1H3z M4 13h8v1H4z M6 14h4v1H6z M7 15h2v1H7z" fill="#249f4b" />
+
+        {/* 3. Foliage Shadows (Dark Green) */}
+        <path d="M7 11h2v1H7z M7 12h2v1H7zm4 0h2v1h-2z M7 13h2v1H7zm3 0h2v1h-2z M7 14h2v1H7z" fill="#115c27" />
+
+        {/* 4. Foliage Highlights (Lime Green) */}
+        <path d="M5 11h2v1H5z M3 12h3v1H3z M4 13h2v1H4z" fill="#a2f263" />
+
+        {/* 5. Dynamic Flower Petals (Main Color) */}
+        <path d="M5 3h1v1H5zm5 0h1v1h-1z M4 4h3v1H4zm5 0h3v1H9z M4 5h8v1H4z M5 6h6v1H5z M6 7h4v1H6z M7 8h2v1H7z" fill={color} />
+
+        {/* 6. Flower Core/Center (Gold) */}
+        <path d="M7 5h2v2H7z" fill="#ffd026" />
+
+        {/* 7. Dynamic Petal Shadows (Blends over any color) */}
+        <path d="M6 4h1v1H6zm5 0h1v1h-1z M9 5h3v1H9z M8 6h3v1H8z M8 7h2v1H8z M8 8h1v1H8z" fill="#000" opacity="0.2" />
+
+        {/* 8. Dynamic Petal Highlights (Blends over any color) */}
+        <path d="M5 3h1v1H5zm5 0h1v1h-1z M4 4h2v1H4zm5 0h2v1H9z M4 5h2v1H4z" fill="#fff" opacity="0.25" />
+    </svg>
+);
+
+const PixelBush = ({ className = "" }) => (
+    <svg width="64" height="32" viewBox="0 0 32 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges" className={`pixelated ${className}`}>
+        {/* Dark Shadow & Outline Base */}
+        <path d="M11 2h10v1h-10z M9 3h14v1h-14z M7 4h18v1h-18z M5 5h22v1h-22z M4 6h24v1h-24z M3 7h26v1h-26z M2 8h28v1h-28z M1 9h30v7h-30z" fill="#122a18" />
+
+        {/* Main Green Leaf Body */}
+        <path d="M12 3h8v1h-8z M10 4h12v1h-12z M8 5h16v1h-16z M6 6h20v1h-20z M5 7h22v1h-22z M4 8h24v1h-24z M2 9h28v6h-28z" fill="#276e33" />
+
+        {/* Highlight Clusters */}
+        <path d="M12 4h4v1h-4z M10 5h5v1h-5z M8 6h5v1h-5z M18 6h3v1h-3z M7 7h4v1h-4z M17 7h5v1h-5z M6 8h3v1h-3z M18 8h5v1h-5z M5 9h3v1h-3z M19 9h3v1h-3z M4 10h3v1h-3z M6 11h2v1h-2z M15 11h2v1h-2z M14 12h2v1h-2z" fill="#59b357" />
+    </svg>
+);
+
 // Removed static constants — now handled via translations utility
 
 function ThemeInput({ onSubmit }) {
     const { user } = useAuth();
     const { language } = useLanguage();
     const t = translations[language];
+
+    const staticStars = useState(() =>
+        [...Array(60)].map(() => ({
+            top: `${Math.random() * 80}%`, // Distributed across the sky above the ground/grass
+            left: `${Math.random() * 100}%`,
+            opacity: 0.12 + Math.random() * 0.48 // Darker/softer stars
+        }))
+    )[0];
 
     const [theme, setTheme] = useState("");
     const [error, setError] = useState("");
@@ -304,55 +353,23 @@ function ThemeInput({ onSubmit }) {
             {/* ── Animated Retro Footer ── */}
             <footer className="relative w-full overflow-hidden bg-[#05020a] pt-32 pb-0">
                 {/* Night Sky with Stars */}
-                <div className="absolute inset-0 pointer-events-none opacity-40">
-                    {[...Array(20)].map((_, i) => (
+                <div className="absolute inset-0 pointer-events-none opacity-30">
+                    {staticStars.map((star, i) => (
                         <div
                             key={i}
-                            className="absolute w-1 h-1 bg-white rounded-full animate-star"
+                            className="absolute w-1 h-1 bg-white/80 rounded-full pixelated animate-star"
                             style={{
-                                top: `${Math.random() * 60}%`,
-                                left: `${Math.random() * 100}%`,
-                                '--duration': `${2 + Math.random() * 4}s`,
-                                opacity: 0.2 + Math.random() * 0.8
+                                top: star.top,
+                                left: star.left,
+                                opacity: star.opacity,
+                                '--duration': `${3 + (i % 5)}s`
                             }}
                         />
                     ))}
                 </div>
 
-                {/* Scenery Container */}
-                <div className="relative h-48 w-full">
-                    {/* Grass layer (Moving) */}
-                    <div 
-                        className="absolute bottom-16 left-0 w-full h-8 animate-scroll-left z-10 pixelated opacity-90"
-                        style={{ 
-                            backgroundImage: `url(${grassTile})`, 
-                            backgroundRepeat: 'repeat-x', 
-                            backgroundSize: 'auto 100%' 
-                        }}
-                    />
-                    
-                    {/* Ground layer (Moving) */}
-                    <div 
-                        className="absolute bottom-0 left-0 w-full h-16 animate-scroll-left z-10 pixelated"
-                        style={{ 
-                            backgroundImage: `url(${groundTile})`, 
-                            backgroundRepeat: 'repeat-x', 
-                            backgroundSize: 'auto 100%' 
-                        }}
-                    />
-
-                    {/* Walking Cat */}
-                    <div className="absolute bottom-14 left-1/2 -translate-x-1/2 z-20">
-                        <img 
-                            src={catGif} 
-                            alt="Walking Cat" 
-                            className="w-16 h-16 object-contain pixelated drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]" 
-                        />
-                    </div>
-                </div>
-
                 {/* Footer Credits */}
-                <div className="relative z-30 py-8 text-center border-t border-white/5 bg-black/50 backdrop-blur-md">
+                <div className="relative z-30 py-8 text-center">
                     <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
                         <p className="text-[10px] font-pixel text-gray-500 uppercase tracking-[0.2em]">
                             ForkTales © 2026 • Infinite Stories await
@@ -362,6 +379,81 @@ function ThemeInput({ onSubmit }) {
                             <a href="#" className="hover:text-[#a78bfa] transition-colors">Terms</a>
                             <a href="#" className="hover:text-[#a78bfa] transition-colors">Discord</a>
                         </div>
+                    </div>
+                </div>
+
+                {/* Scenery Container */}
+                <div className="relative h-80 w-full overflow-hidden">
+                    {/* Sky Background (Static) is already handled by footer bg */}
+
+                    {/* Night Sky with Stars */}
+                    <div className="absolute inset-0 pointer-events-none opacity-30">
+                        {staticStars.map((star, i) => (
+                            <div
+                                key={i}
+                                className="absolute w-1 h-1 bg-white/80 rounded-full pixelated animate-star"
+                                style={{
+                                    top: star.top,
+                                    left: star.left,
+                                    opacity: star.opacity,
+                                    '--duration': `${3 + (i % 5)}s`
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    {/* SVG Props layer (Flowers & Bushes) */}
+                    <div className="absolute bottom-24 left-0 w-[200%] h-16 z-10 flex animate-scroll-left-transform opacity-95 items-end overflow-hidden" style={{ filter: 'brightness(0.55)' }}>
+                        {[...Array(2)].map((_, groupIdx) => (
+                            <div key={groupIdx} className="w-1/2 flex items-end justify-around shrink-0 px-10">
+                                <PixelBush />
+                                <PixelFlower color="#ff77ff" />
+                                <PixelBush />
+                                <PixelBush />
+                                <div className="flex gap-4">
+                                    <PixelFlower color="#ff77ff" />
+                                    <PixelFlower color="#ff4444" />
+                                    <PixelFlower color="#ffaa00" />
+                                </div>
+                                <PixelBush />
+                                <PixelFlower color="#9d06b4" />
+                                <PixelFlower color="#ff7777" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Grass layer (Moving with Gaps) */}
+                    <div className="absolute bottom-24 left-0 w-[200%] h-12 z-10 flex animate-scroll-left-transform opacity-90 items-end overflow-hidden" style={{ filter: 'brightness(0.55)' }}>
+                        {[...Array(2)].map((_, groupIdx) => (
+                            <div key={groupIdx} className="w-1/2 flex justify-around shrink-0 px-8">
+                                <img src={grassTile} alt="grass" className="h-6 object-contain pixelated" />
+                                <img src={grassTile} alt="grass" className="h-6 object-contain pixelated" />
+                                <img src={grassTile} alt="grass" className="h-6 object-contain pixelated" />
+                                <img src={grassTile} alt="grass" className="h-6 object-contain pixelated" />
+                                <img src={grassTile} alt="grass" className="h-6 object-contain pixelated" />
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Ground layer (Moving) */}
+                    <div
+                        className="absolute bottom-0 left-0 w-full h-24 animate-scroll-left z-10 pixelated"
+                        style={{
+                            backgroundImage: `url(${groundTile})`,
+                            backgroundRepeat: 'repeat-x',
+                            backgroundSize: 'auto 100%',
+                            filter: 'brightness(0.55)'
+                        }}
+                    />
+
+                    {/* Walking Cat */}
+                    <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
+                        <img
+                            src={catGif}
+                            alt="Walking Cat"
+                            className="w-44 h-44 object-contain pixelated drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]"
+                            style={{ filter: 'brightness(0.65)' }}
+                        />
                     </div>
                 </div>
             </footer>

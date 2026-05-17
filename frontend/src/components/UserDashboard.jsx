@@ -70,6 +70,25 @@ function UserDashboard() {
         }
     };
 
+    const handleDeleteStory = async (storyId, e) => {
+        e.stopPropagation();
+        if (!window.confirm("Are you sure you want to delete this story? This cannot be undone.")) return;
+        try {
+            await axios.delete(`${API_BASE_URL}/story/${storyId}`);
+            setMyStories(prev => prev.filter(s => s.id !== storyId));
+        } catch (err) {
+            console.error("Failed to delete story:", err);
+            alert("Failed to delete story. Please try again.");
+        }
+    };
+
+    const handleShareStory = (storyId, e) => {
+        e.stopPropagation();
+        const url = `${window.location.origin}/story/${storyId}`;
+        navigator.clipboard.writeText(url);
+        alert("Story link copied to clipboard!");
+    };
+
     if (!user) return null;
 
     const avatarUrl = `https://api.dicebear.com/7.x/pixel-art/svg?seed=${encodeURIComponent(avatarConfig.seed)}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
@@ -203,13 +222,36 @@ function UserDashboard() {
                                     <StoryCard story={story} />
                                     
                                     {/* Overlay Actions on Hover */}
-                                    <div className="absolute inset-0 bg-[#05020a]/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex flex-col items-center justify-center gap-4 p-6 z-20 border border-white/10">
-                                        <button 
-                                            onClick={() => navigate(`/story/${story.id}`)}
-                                            className="w-full bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-bold py-3 rounded-xl transition-all uppercase tracking-wider text-sm flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(124,58,237,0.4)] hover:-translate-y-0.5"
-                                        >
-                                            Play / Resume
-                                        </button>
+                                    <div className="absolute inset-0 bg-[#05020a]/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl flex flex-col items-center justify-center p-6 z-20 border border-white/10">
+                                        
+                                        <div className="flex w-full gap-2 mb-4">
+                                            <button 
+                                                onClick={(e) => { e.stopPropagation(); navigate(`/story/${story.id}`); }}
+                                                className="flex-1 bg-[#7c3aed] hover:bg-[#6d28d9] text-white font-bold py-2 rounded-xl transition-all uppercase tracking-wider text-xs flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(124,58,237,0.4)] hover:-translate-y-0.5"
+                                            >
+                                                Play
+                                            </button>
+                                            <button 
+                                                onClick={(e) => handleDeleteStory(story.id, e)}
+                                                className="w-10 h-10 bg-red-500/20 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-all flex items-center justify-center shrink-0"
+                                                title="Delete Story"
+                                            >
+                                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                  <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
+                                                </svg>
+                                            </button>
+                                            {story.is_published && (
+                                                <button 
+                                                    onClick={(e) => handleShareStory(story.id, e)}
+                                                    className="w-10 h-10 bg-blue-500/20 hover:bg-blue-500 text-blue-500 hover:text-white rounded-xl transition-all flex items-center justify-center shrink-0"
+                                                    title="Copy Share Link"
+                                                >
+                                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                      <path d="M15 8a3 3 0 10-2.977-2.63l-4.94 2.47a3 3 0 100 4.319l4.94 2.47a3 3 0 10.895-1.789l-4.94-2.47a3.027 3.027 0 000-.74l4.94-2.47C13.456 7.68 14.19 8 15 8z" />
+                                                    </svg>
+                                                </button>
+                                            )}
+                                        </div>
                                         
                                         <label className="w-full flex items-center justify-between bg-white/5 hover:bg-white/10 p-3 rounded-xl cursor-pointer transition-colors border border-white/10 mt-auto">
                                             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
@@ -220,7 +262,7 @@ function UserDashboard() {
                                                     type="checkbox" 
                                                     className="sr-only peer" 
                                                     checked={story.is_published || false}
-                                                    onChange={() => handleTogglePublish(story.id)}
+                                                    onChange={(e) => { e.stopPropagation(); handleTogglePublish(story.id); }}
                                                 />
                                                 <div className="w-9 h-5 bg-black border border-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-gray-400 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-[#7c3aed] peer-checked:after:bg-white"></div>
                                             </div>

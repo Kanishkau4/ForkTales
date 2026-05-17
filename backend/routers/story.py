@@ -167,6 +167,25 @@ def toggle_publish(
     db.refresh(story)
     return {"status": "success", "is_published": story.is_published}
 
+@router.delete("/{story_id}")
+def delete_story(
+    story_id: int,
+    db: Session = Depends(get_db)
+):
+    """Delete a story and all its nodes."""
+    story = db.query(Story).filter(Story.id == story_id).first()
+    if not story:
+        raise HTTPException(status_code=404, detail="Story not found")
+    
+    # Delete all nodes associated with the story
+    db.query(Node).filter(Node.story_id == story_id).delete()
+    
+    # Delete the story itself
+    db.delete(story)
+    db.commit()
+    
+    return {"status": "success", "message": "Story deleted successfully"}
+
 @router.get("/user/{user_id}", response_model=list[RecentStoryResponse])
 def get_user_stories(
     user_id: str,

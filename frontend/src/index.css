@@ -200,20 +200,46 @@
   }
 
   @keyframes scroll-left {
-    0% { background-position: 0 0; }
-    100% { background-position: -1000px 0; }
+    0% {
+      background-position: 0 0;
+    }
+
+    100% {
+      background-position: -1000px 0;
+    }
   }
 
   .animate-scroll-left {
-    animation: scroll-left 20s linear infinite;
+    animation: scroll-left 60s linear infinite;
   }
 
-  @keyframes star-flicker {
-    0%, 100% { opacity: 0.3; transform: scale(0.8); }
-    50% { opacity: 1; transform: scale(1.2); }
+  @keyframes scroll-left-transform {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-scroll-left-transform {
+    animation: scroll-left-transform 60s linear infinite;
+  }
+
+  @keyframes star-brighten {
+    0% {
+      opacity: 0.15;
+      transform: scale(0.6);
+    }
+
+    100% {
+      opacity: 1;
+      transform: scale(1.5);
+    }
   }
 
   .animate-star {
-    animation: star-flicker var(--duration, 3s) infinite ease-in-out;
+    animation: star-brighten var(--duration, 4s) infinite ease-in-out alternate;
   }
 }

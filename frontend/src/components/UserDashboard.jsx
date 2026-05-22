@@ -110,10 +110,10 @@ function UserDashboard() {
                 <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20" />
             </div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-6 pt-32">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 pt-24 sm:pt-32">
                 
                 {/* 1. PLAYER PROFILE SECTION */}
-                <div className="bg-[#0e0e14]/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-8 mb-16 shadow-[0_0_40px_rgba(124,58,237,0.1)] flex flex-col md:flex-row items-center md:items-stretch gap-8">
+                <div className="bg-[#0e0e14]/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-5 sm:p-8 mb-10 sm:mb-16 shadow-[0_0_40px_rgba(124,58,237,0.1)] flex flex-col sm:flex-row items-center gap-6">
                     
                     {/* Avatar Card */}
                     <div className="relative group cursor-pointer" onClick={() => setIsEditingAvatar(true)}>
@@ -142,18 +142,18 @@ function UserDashboard() {
                     </div>
 
                     {/* RPG Stats */}
-                    <div className="flex gap-4 items-center justify-center w-full md:w-auto">
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center min-w-[100px] hover:bg-white/10 transition-colors shadow-lg">
-                            <div className="text-3xl font-pixel text-[#a78bfa] mb-2">{stats.quests}</div>
-                            <div className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Quests Forged</div>
+                    <div className="flex gap-3 items-center justify-center w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center min-w-[80px] sm:min-w-[100px] flex-1 sm:flex-none hover:bg-white/10 transition-colors shadow-lg">
+                            <div className="text-2xl sm:text-3xl font-pixel text-[#a78bfa] mb-2">{stats.quests}</div>
+                            <div className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-gray-500">Quests Forged</div>
                         </div>
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center min-w-[100px] hover:bg-white/10 transition-colors shadow-lg">
-                            <div className="text-3xl font-pixel text-green-400 mb-2">{stats.victories}</div>
-                            <div className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Victories</div>
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center min-w-[80px] sm:min-w-[100px] flex-1 sm:flex-none hover:bg-white/10 transition-colors shadow-lg">
+                            <div className="text-2xl sm:text-3xl font-pixel text-green-400 mb-2">{stats.victories}</div>
+                            <div className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-gray-500">Victories</div>
                         </div>
-                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center min-w-[100px] hover:bg-white/10 transition-colors shadow-lg">
-                            <div className="text-3xl font-pixel text-red-500 mb-2">{stats.deaths}</div>
-                            <div className="text-[10px] uppercase font-bold tracking-widest text-gray-500">Deaths</div>
+                        <div className="bg-white/5 border border-white/10 rounded-2xl p-4 text-center min-w-[80px] sm:min-w-[100px] flex-1 sm:flex-none hover:bg-white/10 transition-colors shadow-lg">
+                            <div className="text-2xl sm:text-3xl font-pixel text-red-500 mb-2">{stats.deaths}</div>
+                            <div className="text-[9px] sm:text-[10px] uppercase font-bold tracking-widest text-gray-500">Deaths</div>
                         </div>
                     </div>
                 </div>
@@ -216,7 +216,7 @@ function UserDashboard() {
                             <div className="w-10 h-10 border-4 border-[#7c3aed] border-t-transparent rounded-full animate-spin" />
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                             {myStories.map((story) => (
                                 <div key={story.id} className="relative group flex flex-col h-full">
                                     <StoryCard story={story} />

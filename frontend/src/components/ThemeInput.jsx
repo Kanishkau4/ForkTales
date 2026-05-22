@@ -174,7 +174,7 @@ function ThemeInput({ onSubmit }) {
             {/* ── Hero Section ── */}
             <div className="relative h-[92vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden">
 
-                {/* Background Video — light overlay */}
+                {/* Background Video */}
                 <div className="absolute inset-0">
                     <video
                         autoPlay loop muted playsInline
@@ -211,9 +211,9 @@ function ThemeInput({ onSubmit }) {
                         <form onSubmit={handleSubmit} className="relative group w-full">
                             <div className="absolute -inset-0.5 bg-gradient-to-r from-[#7c3aed]/40 to-[#a78bfa]/20 rounded-2xl blur-md group-hover:opacity-100 opacity-60 transition duration-500" />
 
-                            <div className="relative flex items-center bg-[#0e0e14]/90 backdrop-blur-2xl border border-white/10 rounded-2xl p-2.5 pl-5 shadow-2xl">
-                                {/* Book icon */}
-                                <div className="text-gray-500 mr-3 shrink-0">
+                            <div className="relative flex flex-wrap sm:flex-nowrap items-center bg-[#0e0e14]/90 backdrop-blur-2xl border border-white/10 rounded-2xl p-2.5 pl-4 sm:pl-5 shadow-2xl gap-2 sm:gap-0">
+                                {/* Book icon — hidden on very small to save space */}
+                                <div className="text-gray-500 shrink-0 hidden xs:block sm:mr-3">
                                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                                     </svg>
@@ -225,57 +225,60 @@ function ThemeInput({ onSubmit }) {
                                     placeholder={`${t.inputPlaceholderBase}${placeholderText}`}
                                     value={theme}
                                     onChange={(e) => setTheme(e.target.value)}
-                                    className="flex-1 bg-transparent border-none outline-none text-sm md:text-base font-medium text-white placeholder:text-gray-600 h-10"
+                                    className="flex-1 min-w-0 bg-transparent border-none outline-none text-sm md:text-base font-medium text-white placeholder:text-gray-600 h-10"
                                 />
 
-                                {/* Difficulty Dropdown */}
-                                <div className="relative shrink-0">
-                                    <button
-                                        type="button"
-                                        id="difficulty-selector"
-                                        onClick={() => setDiffOpen(!diffOpen)}
-                                        className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border-l border-white/10 px-3 py-2 mx-2 rounded-lg text-xs font-semibold text-gray-400 transition-colors cursor-pointer whitespace-nowrap"
-                                    >
-                                        {selectedDiff.label}
-                                        <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform ${diffOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
-                                        </svg>
-                                    </button>
-                                    {diffOpen && (
-                                        <div className="absolute right-0 top-full mt-2 w-52 bg-[#111]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
-                                            {t.difficulties.map(d => (
-                                                <button
-                                                    key={d.value}
-                                                    type="button"
-                                                    onClick={() => { setDifficulty(d.value); setDiffOpen(false); }}
-                                                    className={`w-full text-left px-4 py-3 hover:bg-white/10 transition-colors border-b border-white/5 last:border-0 ${difficulty === d.value ? 'bg-[#7c3aed]/20' : ''}`}
-                                                >
-                                                    <div className={`text-sm font-semibold ${difficulty === d.value ? 'text-[#a78bfa]' : 'text-gray-300'}`}>{d.label}</div>
-                                                    <div className="text-[10px] text-gray-500 mt-0.5">{d.desc}</div>
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
+                                {/* Difficulty + Submit — always on same row */}
+                                <div className="flex items-center gap-1 shrink-0">
+                                    {/* Difficulty Dropdown */}
+                                    <div className="relative">
+                                        <button
+                                            type="button"
+                                            id="difficulty-selector"
+                                            onClick={() => setDiffOpen(!diffOpen)}
+                                            className="flex items-center gap-1.5 bg-white/5 hover:bg-white/10 border border-white/10 px-2.5 py-2 rounded-lg text-xs font-semibold text-gray-400 transition-colors cursor-pointer whitespace-nowrap"
+                                        >
+                                            {selectedDiff.label}
+                                            <svg xmlns="http://www.w3.org/2000/svg" className={`h-3 w-3 transition-transform ${diffOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        {diffOpen && (
+                                            <div className="absolute right-0 top-full mt-2 w-52 bg-[#111]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+                                                {t.difficulties.map(d => (
+                                                    <button
+                                                        key={d.value}
+                                                        type="button"
+                                                        onClick={() => { setDifficulty(d.value); setDiffOpen(false); }}
+                                                        className={`w-full text-left px-4 py-3 hover:bg-white/10 transition-colors border-b border-white/5 last:border-0 ${difficulty === d.value ? 'bg-[#7c3aed]/20' : ''}`}
+                                                    >
+                                                        <div className={`text-sm font-semibold ${difficulty === d.value ? 'text-[#a78bfa]' : 'text-gray-300'}`}>{d.label}</div>
+                                                        <div className="text-[10px] text-gray-500 mt-0.5">{d.desc}</div>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
 
-                                {/* Submit / Auth gate button */}
-                                <button
-                                    type="submit"
-                                    id="generate-story-btn"
-                                    disabled={user && manaPoints <= 0}
-                                    title={!user ? t.loginToGenerate : (manaPoints <= 0 ? t.outOfMana : t.generateBtn)}
-                                    className={`w-10 h-10 flex items-center justify-center text-white rounded-xl shadow-[0_0_16px_rgba(124,58,237,0.5)] transition-all duration-300 shrink-0 ${user && manaPoints <= 0 ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-[#7c3aed] hover:bg-[#6d28d9] hover:scale-105 active:scale-95'}`}
-                                >
-                                    {!user ? (
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                                        </svg>
-                                    ) : (
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                                        </svg>
-                                    )}
-                                </button>
+                                    {/* Submit button */}
+                                    <button
+                                        type="submit"
+                                        id="generate-story-btn"
+                                        disabled={user && manaPoints <= 0}
+                                        title={!user ? t.loginToGenerate : (manaPoints <= 0 ? t.outOfMana : t.generateBtn)}
+                                        className={`w-10 h-10 flex items-center justify-center text-white rounded-xl shadow-[0_0_16px_rgba(124,58,237,0.5)] transition-all duration-300 shrink-0 ${user && manaPoints <= 0 ? 'bg-gray-600 cursor-not-allowed opacity-50' : 'bg-[#7c3aed] hover:bg-[#6d28d9] hover:scale-105 active:scale-95'}`}
+                                    >
+                                        {!user ? (
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                                            </svg>
+                                        ) : (
+                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.2}>
+                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                            </svg>
+                                        )}
+                                    </button>
+                                </div>
                             </div>
 
                             {error && (

@@ -189,8 +189,8 @@ function StoryGame({ story, onNewStory }) {
                             <AnimatedSprite
                                 spriteUrl={isWinningEnding ? character.win.src : character.die.src}
                                 frameCount={isWinningEnding ? character.win.frames : character.die.frames}
-                                width={Math.round(120 * character.sizeMultiplier)}
-                                height={Math.round(120 * character.sizeMultiplier)}
+                                width={Math.round(200 * character.sizeMultiplier)}
+                                height={Math.round(200 * character.sizeMultiplier)}
                                 animationDuration={isWinningEnding ? character.win.duration : character.die.duration}
                                 className="relative z-10 drop-shadow-[0_10px_20px_rgba(0,0,0,0.5)]"
                             />
@@ -257,8 +257,8 @@ function StoryGame({ story, onNewStory }) {
                         <AnimatedSprite
                             spriteUrl={character.idle.src}
                             frameCount={character.idle.frames}
-                            width={Math.round(96 * character.sizeMultiplier)}
-                            height={Math.round(96 * character.sizeMultiplier)}
+                            width={Math.round(160 * character.sizeMultiplier)}
+                            height={Math.round(160 * character.sizeMultiplier)}
                             animationDuration={character.idle.duration}
                             className="drop-shadow-[0_0_15px_rgba(124,58,237,0.4)]"
                         />
@@ -270,8 +270,8 @@ function StoryGame({ story, onNewStory }) {
                             <AnimatedSprite
                                 spriteUrl={character.idle.src}
                                 frameCount={character.idle.frames}
-                                width={Math.round(40 * character.sizeMultiplier)}
-                                height={Math.round(40 * character.sizeMultiplier)}
+                                width={Math.round(80 * character.sizeMultiplier)}
+                                height={Math.round(80 * character.sizeMultiplier)}
                                 animationDuration={character.idle.duration}
                             />
                             <span className="text-xs font-bold text-[#a78bfa] uppercase tracking-widest">{character.name}</span>

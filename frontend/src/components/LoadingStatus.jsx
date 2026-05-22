@@ -47,8 +47,8 @@ function LoadingStatus({ theme }) {
                     <AnimatedSprite
                         spriteUrl={character.walk.src}
                         frameCount={character.walk.frames}
-                        width={Math.round(96 * character.sizeMultiplier)}
-                        height={Math.round(96 * character.sizeMultiplier)}
+                        width={Math.round(160 * character.sizeMultiplier)}
+                        height={Math.round(160 * character.sizeMultiplier)}
                         animationDuration={character.walk.duration}
                         className="relative z-10"
                     />
